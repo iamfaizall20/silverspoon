@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap');
+
+/* ─── SIDEBAR SHELL ─── */
+.sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background: #FFFFFF;
+    border-right: 0.5px solid rgba(92, 61, 30, 0.12);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    position: sticky;
+    top: 0;
+}
+
+/* ─── BRAND ─── */
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 28px 22px 24px;
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #5C3D1E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(92, 61, 30, 0.28);
+}
+
+.brand-icon .material-icons {
+    font-size: 20px;
+    color: #FFFCFB;
+}
+
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #5C3D1E;
+    letter-spacing: -0.3px;
+    line-height: 1.1;
+}
+
+.brand-sub {
+    font-size: 10px;
+    font-weight: 500;
+    color: #A8896E;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+
+/* ─── DIVIDERS ─── */
+.sidebar-divider {
+    height: 1px;
+    background: rgba(92, 61, 30, 0.10);
+    margin: 0 22px;
+}
+
+.sidebar-divider--slim {
+    margin: 10px 22px;
+}
+
+/* ─── NAV ─── */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 18px 12px 0;
+    gap: 2px;
+}
+
+.nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #A8896E;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    padding: 8px 10px 6px;
+}
+
+/* ─── NAV LINK ─── */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #7A6050;
+    font-size: 13.5px;
+    font-weight: 500;
+    position: relative;
+    transition: background 0.18s ease, color 0.18s ease;
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    background: rgba(200, 138, 74, 0.08);
+    color: #5C3D1E;
+}
+
+.nav-link:hover .nav-icon {
+    color: #C88A4A;
+}
+
+/* Active state */
+.nav-link.active {
+    background: rgba(200, 138, 74, 0.12);
+    color: #5C3D1E;
+    font-weight: 600;
+}
+
+.nav-link.active .nav-icon {
+    color: #C88A4A;
+}
+
+.nav-link.active .nav-indicator {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 18px;
+    background: #C88A4A;
+    border-radius: 3px 0 0 3px;
+}
+
+/* ─── NAV ICON ─── */
+.nav-icon {
+    font-size: 18px;
+    color: #A8896E;
+    flex-shrink: 0;
+    transition: color 0.18s ease;
+}
+
+/* ─── NAV LABEL ─── */
+.nav-label {
+    flex: 1;
+    line-height: 1;
+}
+
+/* ─── BADGE ─── */
+.nav-badge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: #C88A4A;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ─── SPACER ─── */
+.sidebar-spacer {
+    flex: 1;
+}
+
+/* ─── FOOTER / LOGOUT ─── */
+.sidebar-footer {
+    padding: 0 0 20px;
+}
+
+.sidebar-footer .sidebar-divider {
+    margin-bottom: 14px;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: calc(100% - 24px);
+    margin: 0 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(92, 61, 30, 0.18);
+    background: transparent;
+    color: #7A6050;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.logout-btn:hover {
+    background: rgba(200, 60, 60, 0.07);
+    border-color: rgba(180, 60, 60, 0.3);
+    color: #9B2C2C;
+}
+
+.logout-btn:hover .logout-icon {
+    color: #9B2C2C;
+}
+
+.logout-icon {
+    font-size: 18px;
+    color: #A8896E;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+
+.logout-label {
+    flex: 1;
+}

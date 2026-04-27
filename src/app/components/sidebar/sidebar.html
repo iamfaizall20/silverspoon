@@ -1,0 +1,84 @@
+<div class="sidebar">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+        <div class="brand-icon">
+            <span class="material-icons">icecream</span>
+        </div>
+        <div class="brand-text">
+            <h1 class="brand-name">SilverSpoon</h1>
+            <p class="brand-sub">Admin Panel</p>
+        </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="sidebar-divider"></div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+        <p class="nav-section-label">Main Menu</p>
+
+        <a class="nav-link" routerLink="dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+            (click)="setActive('dashboard')">
+            <span class="nav-icon material-icons">grid_view</span>
+            <span class="nav-label">Dashboard</span>
+            <span class="nav-indicator"></span>
+        </a>
+
+        <a class="nav-link" routerLink="orders" routerLinkActive="active" (click)="setActive('orders')">
+            <span class="nav-icon material-icons">receipt_long</span>
+            <span class="nav-label">Orders</span>
+            <span class="nav-badge" *ngIf="pendingOrders > 0">{{ pendingOrders }}</span>
+            <span class="nav-indicator"></span>
+        </a>
+
+        <a class="nav-link" routerLink="products" routerLinkActive="active" (click)="setActive('products')">
+            <span class="nav-icon material-icons">inventory_2</span>
+            <span class="nav-label">Products</span>
+            <span class="nav-indicator"></span>
+        </a>
+
+        <a class="nav-link" routerLink="users" routerLinkActive="active" (click)="setActive('users')">
+            <span class="nav-icon material-icons">group</span>
+            <span class="nav-label">Users</span>
+            <span class="nav-indicator"></span>
+        </a>
+
+        <div class="sidebar-divider sidebar-divider--slim"></div>
+        <p class="nav-section-label">Marketing</p>
+
+        <a class="nav-link" routerLink="newsletter" routerLinkActive="active" (click)="setActive('newsletter')">
+            <span class="nav-icon material-icons">mark_email_read</span>
+            <span class="nav-label">Newsletter</span>
+            <span class="nav-indicator"></span>
+        </a>
+
+        <a class="nav-link" routerLink="offers" routerLinkActive="active" (click)="setActive('offers')">
+            <span class="nav-icon material-icons">local_offer</span>
+            <span class="nav-label">Offers</span>
+            <span class="nav-indicator"></span>
+        </a>
+
+        <div class="sidebar-divider sidebar-divider--slim"></div>
+        <p class="nav-section-label">System</p>
+
+        <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="setActive('settings')">
+            <span class="nav-icon material-icons">tune</span>
+            <span class="nav-label">Settings</span>
+            <span class="nav-indicator"></span>
+        </a>
+    </nav>
+
+    <!-- Spacer -->
+    <div class="sidebar-spacer"></div>
+
+    <!-- Logout -->
+    <div class="sidebar-footer">
+        <div class="sidebar-divider"></div>
+        <button class="logout-btn" (click)="logout()">
+            <span class="material-icons logout-icon">logout</span>
+            <span class="logout-label">Log Out</span>
+        </button>
+    </div>
+
+</div>

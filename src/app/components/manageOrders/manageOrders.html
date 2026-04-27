@@ -1,0 +1,318 @@
+<div class="orders-page">
+
+  <!-- HEADER -->
+  <header class="orders-header">
+    <div class="header-copy">
+      <h1 class="header-title">Manage Orders</h1>
+      <p class="header-description">
+        Accept new orders, move them through preparation and delivery, and keep the queue organized.
+      </p>
+    </div>
+  </header>
+
+  <!-- STATS CARDS -->
+  <section class="orders-stats">
+    <div class="stat-card">
+      <span class="stat-card__icon icon-chip icon-chip--amber">
+        <span class="material-icons">soup_kitchen</span>
+      </span>
+      <div class="stat-card__copy">
+        <span class="stat-card__label">Preparing</span>
+        <strong class="stat-card__value">{{ preparingCount }}</strong>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-card__icon icon-chip icon-chip--violet">
+        <span class="material-icons">delivery_dining</span>
+      </span>
+      <div class="stat-card__copy">
+        <span class="stat-card__label">Out for Delivery</span>
+        <strong class="stat-card__value">{{ outForDeliveryCount }}</strong>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-card__icon icon-chip icon-chip--green">
+        <span class="material-icons">check_circle</span>
+      </span>
+      <div class="stat-card__copy">
+        <span class="stat-card__label">Delivered</span>
+        <strong class="stat-card__value">{{ deliveredCount }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLBAR -->
+  <section class="orders-toolbar">
+    <div class="toolbar-copy">
+      <h2>Orders Table</h2>
+      <p>{{ filteredOrders.length }} order{{ filteredOrders.length === 1 ? '' : 's' }}</p>
+    </div>
+
+    <div class="toolbar-controls">
+      <label class="toolbar-field">
+        <span>Status Filter</span>
+        <select [ngModel]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
+          <option value="all">All Orders</option>
+          <option value="new">New Orders</option>
+          <option value="pending">Preparing</option>
+          <option value="out to delivery">Out for Delivery</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </label>
+
+      <label class="toolbar-field">
+        <span>Rows per page</span>
+        <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <!-- TABLE -->
+  <section class="orders-table-shell">
+    <div class="orders-table-scroll" *ngIf="hasOrders; else emptyState">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let order of pagedOrders; trackBy: trackByOrderId" class="clickable-row"
+            (click)="openOrderSummary(order)">
+
+            <td>
+              <div class="order-id">
+                <strong>{{ order.order_number }}</strong>
+                <span>{{ order.order_date | date:'mediumDate' }}</span>
+              </div>
+            </td>
+
+            <td>
+              <div class="customer-cell">
+                <strong>{{ order.customer_name }}</strong>
+                <span>{{ order.address }}</span>
+              </div>
+            </td>
+
+            <td>
+              <div class="contact-cell">
+                <strong>{{ order.phone }}</strong>
+                <span *ngIf="order.alt_phone">{{ order.alt_phone }}</span>
+              </div>
+            </td>
+
+            <td>
+              <span class="status-badge" [class.status-badge--new]="order.status === 'new'"
+                [class.status-badge--preparing]="order.status === 'pending'"
+                [class.status-badge--out-for-delivery]="order.status === 'out to delivery'"
+                [class.status-badge--delivered]="order.status === 'delivered'"
+                [class.status-badge--cancelled]="order.status === 'cancelled'">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </td>
+
+            <td>
+              <div class="action-cell" (click)="$event.stopPropagation()">
+
+                <!-- NEW: Accept button only -->
+                <ng-container *ngIf="order.status === 'new'">
+                  <button type="button" class="accept-btn" (click)="acceptOrder(order)">
+                    <span class="material-icons">check_circle</span>
+                    <span>Accept</span>
+                  </button>
+                </ng-container>
+
+                <!-- ACTIVE: status dropdown + ⋮ menu -->
+                <ng-container *ngIf="order.status !== 'new' && order.status !== 'cancelled'">
+                  <select class="status-select" [ngModel]="order.status"
+                    (ngModelChange)="onStatusDropdownChange(order, $event)">
+                    <option *ngFor="let option of actionableStatusOptions" [value]="option.value">
+                      {{ option.label }}
+                    </option>
+                  </select>
+
+                  <div class="menu-wrapper">
+                    <button class="menu-btn" type="button" (click)="toggleMenu(order.id)">
+                      <span class="material-icons">more_vert</span>
+                    </button>
+                    <div class="action-menu" *ngIf="openMenuId === order.id">
+                      <button class="action-menu__item" type="button" (click)="editOrder(order)">
+                        <span class="material-icons">edit</span>
+                        Order Summary
+                      </button>
+                      <button class="action-menu__item action-menu__item--danger" type="button"
+                        (click)="cancelOrder(order)">
+                        <span class="material-icons">cancel</span>
+                        Cancel Order
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
+
+                <!-- CANCELLED: no actions -->
+                <ng-container *ngIf="order.status === 'cancelled'">
+                  <span class="cancelled-label">—</span>
+                </ng-container>
+
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <span class="material-icons">inbox</span>
+        <h3>No orders found</h3>
+        <p>Try a different filter or check back later.</p>
+      </div>
+    </ng-template>
+  </section>
+
+  <!-- FOOTER / PAGINATION -->
+  <footer class="orders-footer" *ngIf="hasOrders">
+    <div class="pagination-info">
+      Showing {{ pageStartIndex }} to {{ pageEndIndex }} of {{ filteredOrders.length }} orders
+    </div>
+
+    <div class="pagination-controls">
+      <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+        <span class="material-icons">chevron_left</span>
+      </button>
+
+      <button class="page-btn page-btn--number" *ngFor="let page of visiblePages" (click)="changePage(page)"
+        [class.active]="currentPage === page">
+        {{ page }}
+      </button>
+
+      <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- BACKDROP -->
+  <div *ngIf="isSummaryOpen" class="drawer-backdrop" (click)="closeOrderSummary()"></div>
+
+  <!-- RIGHT DRAWER -->
+  <aside class="order-summary-drawer" [class.open]="isSummaryOpen">
+
+    <div class="drawer-header" *ngIf="selectedOrder">
+      <div>
+        <p class="drawer-eyebrow">Order Summary</p>
+        <h3 class="drawer-title">{{ selectedOrder.order_number }}</h3>
+        <span class="status-badge" [class.status-badge--new]="selectedOrder.status === 'new'"
+          [class.status-badge--preparing]="selectedOrder.status === 'pending'"
+          [class.status-badge--out-for-delivery]="selectedOrder.status === 'out to delivery'"
+          [class.status-badge--delivered]="selectedOrder.status === 'delivered'"
+          [class.status-badge--cancelled]="selectedOrder.status === 'cancelled'">
+          {{ getStatusLabel(selectedOrder.status) }}
+        </span>
+      </div>
+      <button class="drawer-close" (click)="closeOrderSummary()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="drawer-body" *ngIf="selectedOrder">
+
+      <!-- Customer Info -->
+      <div class="drawer-section">
+        <h4 class="drawer-section-title">Customer Info</h4>
+        <div class="info-row">
+          <span class="info-label">Name</span>
+          <span>{{ selectedOrder.customer_name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Phone</span>
+          <span>{{ selectedOrder.phone }}</span>
+        </div>
+        <div class="info-row" *ngIf="selectedOrder.alt_phone">
+          <span class="info-label">Alt. Phone</span>
+          <span>{{ selectedOrder.alt_phone }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Address</span>
+          <span>{{ selectedOrder.address }}</span>
+        </div>
+      </div>
+
+      <!-- Order Info -->
+      <div class="drawer-section">
+        <h4 class="drawer-section-title">Order Details</h4>
+        <div class="info-row">
+          <span class="info-label">Date</span>
+          <span>{{ selectedOrder.order_date | date:'medium' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Payment</span>
+          <span class="payment-badge" [class.payment-badge--cod]="selectedOrder.payment_method === 'cod'">
+            {{ selectedOrder.payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="drawer-section" *ngIf="selectedOrder.order_cups && selectedOrder.order_cups.length > 0">
+        <h4 class="drawer-section-title">Items</h4>
+        <div class="item-row" *ngFor="let item of selectedOrder.order_cups">
+          <div class="item-info">
+            <strong>{{ item.cups?.name || 'Item' }}</strong>
+            <span>
+              {{ item.cups?.scoops }} scoop{{ (item.cups?.scoops ?? '1') !== '1' ? 's' : '' }}
+              &nbsp;·&nbsp; Qty: {{ item.quantity }}
+            </span>
+          </div>
+          <span class="item-price">Rs {{ item.price_at_time * item.quantity }}</span>
+        </div>
+      </div>
+
+      <!-- Flavours -->
+      <div class="drawer-section" *ngIf="selectedOrder.order_flavours && selectedOrder.order_flavours.length > 0">
+        <h4 class="drawer-section-title">Flavours</h4>
+        <div class="flavour-chips">
+          <span class="flavour-chip" *ngFor="let f of selectedOrder.order_flavours">
+            {{ f.flavours.name || 'Flavour #' + f.flavour_id }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="drawer-section">
+        <h4 class="drawer-section-title">Summary</h4>
+        <div class="info-row">
+          <span class="info-label">Subtotal</span>
+          <span>Rs {{ selectedOrder.subtotal }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Delivery Fee</span>
+          <span>Rs {{ selectedOrder.delivery_fee }}</span>
+        </div>
+        <div class="info-row total-row">
+          <span class="info-label">Total</span>
+          <strong>Rs {{ selectedOrder.total }}</strong>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- TOAST -->
+  <div class="toast" [class.toast-visible]="toastVisible">
+    <span class="material-icons" style="font-size:18px; color:#6ED085;">check_circle</span>
+    {{ toastMsg }}
+  </div>
+
+</div>

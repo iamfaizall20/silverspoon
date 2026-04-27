@@ -1,0 +1,248 @@
+<!-- products.component.html -->
+<div class="products-page">
+
+    <!-- ── PAGE HEADER ── -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1 class="page-title">Products Management</h1>
+            <p class="page-sub">Manage flavours, cup sizes and pricing</p>
+        </div>
+    </div>
+
+    <!-- ── TABS ── -->
+    <div class="tabs-bar-wrap">
+
+        <div class="tabs-bar">
+            <button class="tab-btn" [class.tab-active]="activeTab === 'flavours'" (click)="setTab('flavours')">
+                <span class="material-icons tab-icon">palette</span>
+                Flavours
+                <span class="tab-count">{{ flavours.length }}</span>
+            </button>
+
+            <button class="tab-btn" [class.tab-active]="activeTab === 'items'" (click)="setTab('items')">
+                <span class="material-icons tab-icon">local_cafe</span>
+                Items
+                <span class="tab-count">{{ cupSizes.length }}</span>
+            </button>
+        </div>
+
+        <!-- RIGHT SIDE BUTTON -->
+        <button class="btn-add" (click)="openAddModal()">
+            <span class="material-icons">add</span>
+            Add {{ activeTab | titlecase }}
+        </button>
+
+    </div>
+
+    <!-- ── TAB CONTENT ── -->
+    <div class="tab-content">
+
+        <!-- ══ FLAVOURS ══ -->
+        <div class="tab-panel" [class.tab-panel-active]="activeTab === 'flavours'">
+            <div class="flavours-grid">
+                <div class="flavour-card" *ngFor="let f of flavours; let i = index">
+                    <div class="flavour-swatch" [style.background]="f.color">
+                        <span class="swatch-letter">{{ f.name[0] }}</span>
+                        <div class="card-menu-wrap">
+                            <button class="icon-btn icon-menu" (click)="toggleMenu('f-' + i, $event)" title="Options">
+                                <span class="material-icons">more_vert</span>
+                            </button>
+                            <div class="dropdown-menu" [class.dropdown-open]="openMenuId === 'f-' + i">
+                                <button class="dropdown-item" (click)="editFlavour(f, i); closeMenu()">
+                                    <span class="material-icons">edit</span> Edit
+                                </button>
+                                <button class="dropdown-item dropdown-danger" (click)="deleteFlavour(i); closeMenu()">
+                                    <span class="material-icons">delete_outline</span> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flavour-card-body">
+                        <p class="flavour-name">{{ f.name }}</p>
+                        <p class="flavour-hex">{{ f.color }}</p>
+                    </div>
+                </div>
+
+                <div class="empty-state" *ngIf="flavours.length === 0">
+                    <span class="material-icons empty-icon">icecream</span>
+                    <p>No flavours yet. Add your first one!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ ITEMS (Cups + Family Packs combined) ══ -->
+        <div class="tab-panel" [class.tab-panel-active]="activeTab === 'items'">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Name</th>
+                            <th>Scoops</th>
+                            <th>Price</th>
+                            <th>Available</th>
+                            <th style="width:60px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let c of cupSizes; let i = index">
+                            <td class="cell-idx">{{ i + 1 }}</td>
+                            <td>
+                                <div class="name-cell">
+                                    <span class="material-icons name-icon">local_cafe</span>
+                                    <span class="cell-bold">{{ c.name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="name-cell">
+                                    <span class="material-icons name-icon" style="font-size:15px">layers</span>
+                                    <span class="pill-neutral">{{ c.scoops }} scoop{{ c.scoops > 1 ? 's' : '' }}</span>
+                                </div>
+                            </td>
+                            <td class="cell-price">
+                                <span class="price-label">Rs. {{ c.price }}/-</span>
+                            </td>
+                            <td>
+                                <button class="avail-toggle" [class.avail-on]="c.is_active"
+                                    (click)="toggleCupAvailable(i)"
+                                    [title]="c.is_active ? 'Mark unavailable' : 'Mark available'">
+                                    <span class="material-icons avail-icon">
+                                        {{ c.is_active ? 'check_circle' : 'cancel' }}
+                                    </span>
+                                    {{ c.is_active ? 'Available' : 'Unavailable' }}
+                                </button>
+                            </td>
+                            <td>
+                                <div class="menu-wrap">
+                                    <button class="icon-btn icon-menu" (click)="toggleMenu('c-' + i, $event)">
+                                        <span class="material-icons">more_vert</span>
+                                    </button>
+                                    <div class="dropdown-menu" [class.dropdown-open]="openMenuId === 'c-' + i">
+                                        <button class="dropdown-item" (click)="editCup(c, i); closeMenu()">
+                                            <span class="material-icons">edit</span> Edit
+                                        </button>
+                                        <button class="dropdown-item dropdown-danger"
+                                            (click)="deleteCup(i); closeMenu()">
+                                            <span class="material-icons">delete_outline</span> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="cupSizes.length === 0">
+                            <td colspan="6" class="empty-row">No items configured yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /tab-content -->
+
+
+    <!-- ════════════════════════════
+         MODALS
+    ════════════════════════════ -->
+
+    <div class="overlay" [class.overlay-visible]="modalOpen" (click)="closeModal()"></div>
+
+    <!-- FLAVOUR MODAL -->
+    <div class="modal" [class.modal-visible]="modalOpen && modalType === 'flavour'">
+        <div class="modal-header">
+            <h2 class="modal-title">{{ editIndex >= 0 ? 'Edit Flavour' : 'New Flavour' }}</h2>
+            <button class="modal-close" (click)="closeModal()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-field">
+                <label>Flavour Name *</label>
+                <input type="text" [(ngModel)]="flavourForm.name" placeholder="e.g. Strawberry">
+            </div>
+            <div class="form-field">
+                <label>Colour *</label>
+                <div class="color-row">
+                    <input type="color" [(ngModel)]="flavourForm.color" class="color-picker">
+                    <input type="text" [(ngModel)]="flavourForm.color" placeholder="#RRGGBB" class="color-text-input">
+                    <div class="color-preview" [style.background]="flavourForm.color"></div>
+                </div>
+                <div class="quick-colors">
+                    <span *ngFor="let c of quickColors" class="quick-dot" [style.background]="c"
+                        [class.quick-dot-selected]="flavourForm.color === c" (click)="flavourForm.color = c">
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+            <button class="btn-primary" (click)="saveFlavour()" [disabled]="!flavourForm.name.trim()">
+                {{ editIndex >= 0 ? 'Save Changes' : 'Add Flavour' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- ITEM MODAL -->
+    <div class="modal" [class.modal-visible]="modalOpen && modalType === 'cup'">
+        <div class="modal-header">
+            <h2 class="modal-title">{{ editIndex >= 0 ? 'Edit Item' : 'New Item' }}</h2>
+            <button class="modal-close" (click)="closeModal()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Item Name *</label>
+                    <input type="text" [(ngModel)]="cupForm.name" placeholder="e.g. Large Cup">
+                </div>
+                <div class="form-field">
+                    <label>Number of Scoops *</label>
+                    <input type="number" [(ngModel)]="cupForm.scoops" min="1" max="10" placeholder="2">
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Price (Rs.) *</label>
+                <div class="price-input-wrap">
+                    <span class="price-prefix">Rs.</span>
+                    <input type="number" [(ngModel)]="cupForm.price" min="0" placeholder="150">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+            <button class="btn-primary" (click)="saveCup()" [disabled]="!cupForm.name.trim() || cupForm.scoops < 1">
+                {{ editIndex >= 0 ? 'Save Changes' : 'Add Item' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- CONFIRM DELETE -->
+    <div class="overlay" [class.overlay-visible]="confirmOpen" (click)="confirmOpen = false"></div>
+    <div class="modal modal-sm" [class.modal-visible]="confirmOpen">
+        <div class="modal-header">
+            <h2 class="modal-title">Confirm Delete</h2>
+            <button class="modal-close" (click)="confirmOpen = false">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+            <span class="material-icons"
+                style="font-size:44px; color:#C0392B; margin-bottom:8px; display:block;">delete_forever</span>
+            <p class="confirm-msg">
+                Are you sure you want to delete <strong>{{ confirmLabel }}</strong>?
+                This action cannot be undone.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="confirmOpen = false">Cancel</button>
+            <button class="btn-danger" (click)="executeDelete()">Yes, Delete</button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" [class.toast-visible]="toastVisible">
+        <span class="material-icons" style="font-size:18px; color:#6ED085;">check_circle</span>
+        {{ toastMsg }}
+    </div>
+
+</div>

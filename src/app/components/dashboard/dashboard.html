@@ -1,0 +1,240 @@
+<!-- dashboard.component.html -->
+<div class="dashboard-page">
+
+    <!-- ── TOPBAR ── -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <h1 class="topbar-title">Dashboard</h1>
+            <p class="topbar-date">{{ today }}</p>
+        </div>
+        <div class="topbar-right">
+            <div class="notif-btn">
+                <span class="material-icons">notifications</span>
+                <span class="notif-dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── LOADING STATE ── -->
+    <div class="loading-overlay" *ngIf="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading dashboard…</p>
+    </div>
+
+    <!-- ── ERROR STATE ── -->
+    <div class="error-banner" *ngIf="error && !loading">
+        <span class="material-icons">error_outline</span>
+        {{ error }}
+    </div>
+
+    <!-- ── SCROLLABLE CONTENT ── -->
+    <div class="page-content" *ngIf="!loading">
+
+        <!-- ── KPI CARDS ── -->
+        <div class="kpi-grid">
+            <div class="kpi-card" *ngFor="let k of kpis">
+                <div class="kpi-icon" [style.background]="k.iconBg" [style.color]="k.iconColor">
+                    <span class="material-icons">{{ k.icon }}</span>
+                </div>
+                <p class="kpi-label">{{ k.label }}</p>
+                <p class="kpi-value">{{ k.value }}</p>
+                <p class="kpi-change" [class.kpi-up]="k.changeType === 'up'" [class.kpi-down]="k.changeType === 'down'">
+                    <span class="material-icons kpi-arrow">
+                        {{ k.changeType === 'up' ? 'arrow_upward' : 'arrow_downward' }}
+                    </span>
+                    {{ k.change }}
+                </p>
+                <div class="kpi-accent" [style.background]="k.accentColor"></div>
+            </div>
+        </div>
+
+        <!-- ── MID ROW: Bar Chart + Cup Donut ── -->
+        <div class="mid-row">
+
+            <!-- Weekly Revenue Chart (pure CSS bars) -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2 class="card-title">Weekly Revenue</h2>
+                    <div class="chart-legend">
+                        <span class="legend-item">
+                            <span class="legend-dot" style="background:#B87333"></span>This week
+                        </span>
+                        <span class="legend-item">
+                            <span class="legend-dot" style="background:#E8D5C4"></span>Last week
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-chart" *ngIf="weeklyData.length === 0">
+                    <span class="material-icons">bar_chart</span>
+                    <p>No revenue data yet</p>
+                </div>
+
+                <div class="bar-chart" *ngIf="weeklyData.length > 0">
+                    <div class="bar-group" *ngFor="let d of weeklyData">
+                        <div class="bars">
+                            <div class="bar bar-last" [style.height.%]="getBarHeight(d.lastWeek)"
+                                [title]="'Last week: Rs. ' + d.lastWeek">
+                            </div>
+                            <div class="bar bar-this" [style.height.%]="getBarHeight(d.thisWeek)"
+                                [title]="'This week: Rs. ' + d.thisWeek">
+                                <span class="bar-tooltip">Rs. {{ formatK(d.thisWeek) }}</span>
+                            </div>
+                        </div>
+                        <p class="bar-label">{{ d.day }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cup Breakdown -->
+            <div class="card cup-card">
+                <div class="card-header">
+                    <h2 class="card-title">Sales by Cup</h2>
+                    <span class="card-badge">Today</span>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-chart" *ngIf="cupStats.length === 0">
+                    <span class="material-icons">donut_small</span>
+                    <p>No orders today</p>
+                </div>
+
+                <ng-container *ngIf="cupStats.length > 0">
+                    <div class="donut-wrap">
+                        <svg viewBox="0 0 120 120" width="134" height="134">
+                            <ng-container *ngFor="let seg of getDonutSegments()">
+                                <circle cx="60" cy="60" r="50" fill="none" [attr.stroke]="seg.stroke" stroke-width="18"
+                                    [attr.stroke-dasharray]="seg.dasharray" [attr.stroke-dashoffset]="seg.dashoffset" />
+                            </ng-container>
+                            <text x="60" y="54" text-anchor="middle" font-family="'Playfair Display', serif"
+                                font-size="18" fill="#161210" font-weight="600">{{ totalOrdersToday }}</text>
+                            <text x="60" y="68" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="9"
+                                fill="#9A9088">orders today</text>
+                        </svg>
+                    </div>
+
+                    <div class="cup-legend">
+                        <div class="cup-leg-item" *ngFor="let c of cupStats">
+                            <div class="cup-leg-left">
+                                <span class="cup-leg-dot" [style.background]="c.color"></span>
+                                <span class="cup-leg-label">{{ c.label }}</span>
+                            </div>
+                            <div class="cup-leg-right">
+                                <span class="cup-leg-count">{{ c.count }}</span>
+                                <span class="cup-leg-pct">{{ c.percent }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+
+        </div><!-- /mid-row -->
+
+        <!-- ── BOTTOM ROW: Orders Table + Flavours ── -->
+        <div class="bot-row">
+
+            <!-- Recent Orders -->
+            <div class="card orders-card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Orders</h2>
+                    <span class="live-badge">
+                        <span class="live-dot"></span>Live
+                    </span>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-chart" *ngIf="recentOrders.length === 0">
+                    <span class="material-icons">receipt_long</span>
+                    <p>No orders yet</p>
+                </div>
+
+                <table class="orders-table" *ngIf="recentOrders.length > 0">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Cup</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let o of recentOrders">
+                            <td>
+                                <span class="order-id">{{ o.id }}</span>
+                                <span class="order-time">{{ o.time }}</span>
+                            </td>
+                            <td>
+                                <div class="customer-cell">
+                                    <div class="customer-avatar">{{ o.customer[0] }}</div>
+                                    <span class="customer-name">{{ o.customer }}</span>
+                                </div>
+                            </td>
+                            <td class="cup-cell">{{ o.cup }}</td>
+                            <td class="amount-cell">Rs. {{ o.amount }}/-</td>
+                            <td>
+                                <span class="status-pill" [ngClass]="getStatusClass(o.status)">
+                                    <span class="status-dot"></span>
+                                    {{ getStatusLabel(o.status) }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="table-footer" *ngIf="recentOrders.length > 0">
+                    <a class="view-all-link" routerLink="/admin/orders">View all orders →</a>
+                </div>
+            </div>
+
+            <!-- Top Flavours -->
+            <div class="card flavours-card">
+                <div class="card-header">
+                    <h2 class="card-title">Top Flavours</h2>
+                    <span class="card-badge">This Week</span>
+                </div>
+
+                <div class="flavour-stats-row">
+                    <div class="fstat">
+                        <p class="fstat-val">{{ activeFlavours }}</p>
+                        <p class="fstat-label">Active</p>
+                    </div>
+                    <div class="fstat-divider"></div>
+                    <div class="fstat">
+                        <p class="fstat-val">{{ scoopsServedThisWeek }}</p>
+                        <p class="fstat-label">Scoops served</p>
+                    </div>
+                    <div class="fstat-divider"></div>
+                    <div class="fstat">
+                        <p class="fstat-val">{{ soldOutFlavours }}</p>
+                        <p class="fstat-label">Sold out</p>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-chart" *ngIf="topFlavours.length === 0">
+                    <span class="material-icons">icecream</span>
+                    <p>No flavour data this week</p>
+                </div>
+
+                <div class="flavour-list" *ngIf="topFlavours.length > 0">
+                    <div class="flavour-item" *ngFor="let f of topFlavours; let i = index">
+                        <span class="flavour-rank">#{{ i + 1 }}</span>
+                        <div class="flavour-swatch" [style.background]="f.color"></div>
+                        <div class="flavour-info">
+                            <p class="flavour-name">{{ f.name }}</p>
+                            <div class="flavour-bar-wrap">
+                                <div class="flavour-bar" [style.width.%]="f.percent" [style.background]="f.color">
+                                </div>
+                            </div>
+                        </div>
+                        <span class="flavour-pct">{{ f.percent }}%</span>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /bot-row -->
+
+    </div><!-- /page-content -->
+</div>

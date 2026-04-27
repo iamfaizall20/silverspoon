@@ -1,0 +1,62 @@
+<footer class="footer">
+
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="deco deco-3"></div>
+    <div class="deco deco-4"></div>
+
+    <div class="footer-grid">
+
+        <!-- Left: Brand -->
+        <div class="footer-col">
+            <div class="footer-brand-name">SilverSpoon</div>
+            <p class="footer-slogan">
+                Handcrafted scoops made with love,<br />delivered fresh to your doorstep.
+            </p>
+            <div class="footer-details">
+                <div class="detail-row">
+                    <span class="material-icons detail-icon">call</span>
+                    <span>+92 1234567897</span>
+                </div>
+                <div class="detail-row">
+                    <span class="material-icons detail-icon">location_on</span>
+                    <span>Station Road, Larkana</span>
+                </div>
+                <div class="detail-row">
+                    <span class="material-icons detail-icon">schedule</span>
+                    <span>Mon–Sun · 4pm – 2am</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle: Navigation -->
+        <div class="footer-col footer-col--center">
+            <p class="footer-col-title">Navigation</p>
+            <ul class="footer-links">
+                <li *ngFor="let link of navLinks">
+                    <a [href]="link.href">
+                        <span class="material-icons link-icon">chevron_right</span>
+                        {{ link.label }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Right: Socials -->
+        <div class="footer-col">
+            <p class="footer-col-title">Follow us</p>
+            <div class="social-grid">
+                <a *ngFor="let s of socialLinks" class="social-pill" href="#">
+                    <span class="material-icons social-icon">{{ s.icon }}</span>
+                    <span>{{ s.label }}</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        &copy; {{ currentYear }} SilverSpoon &middot; Built by Faizzal Hassan
+    </div>
+
+</footer>

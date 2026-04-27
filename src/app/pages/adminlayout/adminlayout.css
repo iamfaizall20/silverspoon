@@ -1,0 +1,37 @@
+/* Root container */
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+    background: #ffffff;
+    color: #A8896E;
+}
+
+/* Content area */
+.admin-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+/* Smooth scrolling */
+.admin-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+/* Responsive (mobile) */
+@media (max-width: 768px) {
+    .admin-container {
+        flex-direction: column;
+    }
+
+    .admin-content {
+        height: auto;
+        padding: 16px;
+    }
+}

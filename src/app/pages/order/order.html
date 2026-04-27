@@ -1,0 +1,311 @@
+<!-- order.component.html -->
+<div class="order-page">
+
+    <!-- ── HEADER ── -->
+    <div class="order-header">
+        <button class="back-btn" onclick="history.back()">
+            <span class="material-icons">arrow_back</span>
+        </button>
+        <h1 class="header-text">Make your Order</h1>
+        <p class="header-para">
+            Have a look at our flavours? <a routerLink="/">Go to Home</a>
+        </p>
+    </div>
+
+    <!-- ── PROGRESS ── -->
+    <div class="order-progress">
+        <div class="progress" [class.active]="isActive(1)" [class.done]="isDone(1)">
+            <h1 class="number">
+                <span *ngIf="!isDone(1)">1</span>
+                <span *ngIf="isDone(1)" class="material-icons" style="font-size:18px">check</span>
+            </h1>
+            <p class="label">Identity</p>
+        </div>
+        <div class="seperator" [class.done]="isLineDone(1)"></div>
+
+        <div class="progress" [class.active]="isActive(2)" [class.done]="isDone(2)">
+            <h1 class="number">
+                <span *ngIf="!isDone(2)">2</span>
+                <span *ngIf="isDone(2)" class="material-icons" style="font-size:18px">check</span>
+            </h1>
+            <p class="label">Ice Cream</p>
+        </div>
+        <div class="seperator" [class.done]="isLineDone(2)"></div>
+
+        <div class="progress" [class.active]="isActive(3)" [class.done]="isDone(3)">
+            <h1 class="number">
+                <span *ngIf="!isDone(3)">3</span>
+                <span *ngIf="isDone(3)" class="material-icons" style="font-size:18px">check</span>
+            </h1>
+            <p class="label">Payment</p>
+        </div>
+        <div class="seperator" [class.done]="isLineDone(3)"></div>
+
+        <div class="progress" [class.active]="isActive(4)" [class.done]="isDone(4)">
+            <h1 class="number">4</h1>
+            <p class="label">Confirm</p>
+        </div>
+    </div>
+
+    <!-- ── FORM ── -->
+    <div class="order-form">
+
+        <!-- STEP 1: IDENTITY -->
+        <div class="identity-section" [class.active]="isActive(1)">
+            <div class="identity-right">
+                <div class="field">
+                    <label>Name *</label>
+                    <input type="text" placeholder="Customer Name" [(ngModel)]="order.name">
+                </div>
+                <div class="field">
+                    <label>Phone Number *</label>
+                    <input type="text" placeholder="e.g. 0300-1234567" [(ngModel)]="order.phone">
+                </div>
+                <div class="field">
+                    <label>Alternate Phone Number</label>
+                    <input type="text" placeholder="Optional alternate number" [(ngModel)]="order.altPhone">
+                </div>
+            </div>
+            <div class="identity-left">
+                <div class="field">
+                    <label>Delivery Address *</label>
+                    <textarea name="" [(ngModel)]="order.address" id="" cols="30" rows="10"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: ICE CREAM -->
+        <div class="icecream-section" [class.active]="isActive(2)">
+            <div class="icecream-left">
+
+                <!-- Cup Quantity Selector -->
+                <div class="cups-selector">
+                    <label class="section-label">Select Cups & Quantities *</label>
+                    <p class="section-hint">Choose cup sizes and enter quantity for each</p>
+
+                    <div class="cup-rows">
+                        <div class="cup-row" *ngFor="let cup of cupSizes">
+                            <div class="cup-row-info">
+                                <span class="cup-name">{{ cup.name }}</span>
+                                <span class="cup-meta">{{ cup.scoops }} · Rs.{{ cup.price }}/-</span>
+                            </div>
+                            <div class="cup-qty-controls">
+                                <button class="qty-btn" (click)="decrementCup(cup)"
+                                    [disabled]="getCupQty(cup.id) === 0">
+                                    <span class="material-icons">remove</span>
+                                </button>
+                                <span class="qty-val">{{ getCupQty(cup.id) }}</span>
+                                <button class="qty-btn" (click)="incrementCup(cup)">
+                                    <span class="material-icons">add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cups-summary" *ngIf="totalCupsCount > 0">
+                        <span class="material-icons" style="font-size:15px">shopping_cart</span>
+                        {{ totalCupsCount }} cup{{ totalCupsCount !== 1 ? 's' : '' }} selected
+                    </div>
+                </div>
+
+                <!-- Flavour Selection -->
+                <div class="flavours-selector">
+                    <label class="section-label">Choose Flavours *</label>
+                    <p class="section-hint">Select up to 2 flavours</p>
+
+                    <div class="selected-flavours-row" *ngIf="order.flavours.length > 0">
+                        <span class="selected-chip" *ngFor="let id of order.flavours" (click)="toggleFlavour(id)">
+                            {{ getFlavourById(id)?.name }}
+                            <span class="material-icons remove-icon">close</span>
+                        </span>
+                    </div>
+
+                    <div class="flavours-grid">
+                        <div class="flavour-chip" *ngFor="let f of flavours" [class.selected]="isFlavourSelected(f.id)"
+                            (click)="toggleFlavour(f.id)">
+                            <span class="dot" [style.background]="f.color"></span>
+                            {{ f.name }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="icecream-right">
+                <div class="price-list">
+                    <div class="price-list-header">
+                        <h3>Price List</h3>
+                    </div>
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Size</th>
+                                <th>Scoops</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let cup of cupSizes">
+                                <td>{{ cup.name }}</td>
+                                <td>{{ cup.scoops }}</td>
+                                <td>Rs. {{ cup.price }}/-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: PAYMENT -->
+        <div class="payment-section" [class.active]="isActive(3)">
+            <h2>Select Payment Method</h2>
+
+            <div class="payment-option" [class.selected]="order.paymentMethod === 'cod'" (click)="selectPayment('cod')">
+                <div class="radio-circle"></div>
+                <input type="radio" name="payment" value="cod">
+                <div class="payment-option-info">
+                    <p class="name">Cash on Delivery</p>
+                    <p class="desc">Pay when your order arrives</p>
+                </div>
+                <span class="material-icons payment-icon">local_atm</span>
+            </div>
+
+            <div class="payment-option" [class.selected]="order.paymentMethod === 'online'"
+                (click)="selectPayment('online')">
+                <div class="radio-circle"></div>
+                <input type="radio" name="payment" value="online">
+                <div class="payment-option-info">
+                    <p class="name">Online Payment</p>
+                    <p class="desc">Pay via card, EasyPaisa or JazzCash</p>
+                </div>
+                <span class="material-icons payment-icon">credit_card</span>
+            </div>
+        </div>
+
+        <!-- STEP 4: CONFIRMATION / RECEIPT -->
+        <div class="confirmation-section" [class.active]="isActive(4)">
+            <h2>Order Summary</h2>
+
+            <!-- THERMAL RECEIPT -->
+            <div class="receipt">
+                <!-- Top serrated edge -->
+                <div class="receipt-edge receipt-edge--top"></div>
+
+                <div class="receipt-inner">
+                    <!-- Shop header -->
+                    <div class="receipt-shop-header">
+                        <p class="receipt-shop-name">🍦 Silver Spoon</p>
+                        <p class="receipt-shop-sub">ICE CREAM PARLOUR</p>
+                        <p class="receipt-shop-addr">Larkana, Pakistan · 0300-0000000</p>
+                        <div class="receipt-divider">--------------------------------</div>
+                        <div class="receipt-meta-row">
+                            <span>DATE: {{ orderDate }}</span>
+                            <span>TIME: {{ orderTime }}</span>
+                        </div>
+                        <div class="receipt-meta-row">
+                            <span>ORDER #{{ orderNumber }}</span>
+                            <span>{{ paymentLabel | uppercase }}</span>
+                        </div>
+                        <div class="receipt-divider">================================</div>
+                    </div>
+
+                    <!-- Customer info -->
+                    <div class="receipt-customer">
+                        <div class="receipt-kv"><span>CUST:</span><span>{{ order.name | uppercase }}</span></div>
+                        <div class="receipt-kv"><span>TEL:</span><span>{{ order.phone }}</span></div>
+                        <div class="receipt-kv receipt-addr-row"><span>ADDR:</span><span>{{ order.address }}</span>
+                        </div>
+                    </div>
+                    <div class="receipt-divider">--------------------------------</div>
+
+                    <!-- Items -->
+                    <div class="receipt-items-header">
+                        <span>ITEM</span><span>QTY</span><span>PRICE</span>
+                    </div>
+                    <div class="receipt-divider">- - - - - - - - - - - - - - - -</div>
+
+                    <ng-container *ngFor="let cup of cupSizes">
+                        <div class="receipt-item" *ngIf="getCupQty(cup.id) > 0">
+                            <span class="receipt-item-name">{{ cup.name | uppercase }}</span>
+                            <span>x{{ getCupQty(cup.id) }}</span>
+                            <span>Rs.{{ cup.price * getCupQty(cup.id) }}</span>
+                        </div>
+                    </ng-container>
+
+                    <div class="receipt-divider">- - - - - - - - - - - - - - - -</div>
+
+                    <!-- Flavours -->
+                    <div class="receipt-flavours">
+                        <span>FLAVOUR(S):</span>
+                        <span>{{ selectedFlavourNames | uppercase }}</span>
+                    </div>
+
+                    <div class="receipt-divider">================================</div>
+
+                    <!-- Totals -->
+                    <div class="receipt-total-rows">
+                        <div class="receipt-kv">
+                            <span>SUBTOTAL</span><span>Rs. {{ subtotal }}/-</span>
+                        </div>
+                        <div class="receipt-kv">
+                            <span>DELIVERY</span><span>Rs. {{ deliveryFee }}/-</span>
+                        </div>
+                        <div class="receipt-divider">--------------------------------</div>
+                        <div class="receipt-kv receipt-grand-total">
+                            <span>TOTAL</span><span>Rs. {{ total }}/-</span>
+                        </div>
+                        <div class="receipt-kv receipt-tendered" *ngIf="order.paymentMethod === 'cod'">
+                            <span>TENDERED</span><span>ON DELIVERY</span>
+                        </div>
+                    </div>
+
+                    <div class="receipt-divider">================================</div>
+
+                    <!-- Footer -->
+                    <div class="receipt-footer">
+                        <p>** THANK YOU FOR YOUR ORDER! **</p>
+                        <p>Delivered within 30-45 minutes</p>
+                        <p>No refunds after delivery</p>
+                        <div class="receipt-barcode">
+                            <div class="barcode-bars">
+                                <ng-container *ngFor="let b of barcodePattern">
+                                    <span [style.width.px]="b.w" [style.background]="b.c"></span>
+                                </ng-container>
+                            </div>
+                            <p class="barcode-num">{{ orderNumber }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom serrated edge -->
+                <div class="receipt-edge receipt-edge--bottom"></div>
+            </div>
+        </div>
+
+    </div><!-- /order-form -->
+
+    <!-- ── SUCCESS DIALOG ── -->
+    <div class="success-dialog" [class.visible]="showSuccess">
+        <div class="success-box">
+            <div class="success-icon">🎉</div>
+            <h2>Order Confirmed!</h2>
+            <p>Your ice cream is on its way. Redirecting you to the home page shortly.</p>
+            <button class="success-btn" (click)="goHome()">Go to Home</button>
+        </div>
+    </div>
+
+    <!-- ── FOOTER BUTTONS ── -->
+    <div class="form-footer">
+        <div class="btns">
+            <button class="cancel-btn" (click)="currentStep > 1 ? prevStep() : cancelOrder()">
+                {{ currentStep > 1 ? 'Back' : 'Cancel' }}
+            </button>
+            <button class="confirm" (click)="nextStep()" [disabled]="isNextDisabled">
+                {{ confirmLabel }}
+                <span class="material-icons" style="font-size:16px">
+                    {{ currentStep === totalSteps ? 'check_circle' : 'arrow_forward' }}
+                </span>
+            </button>
+        </div>
+    </div>
+
+</div>

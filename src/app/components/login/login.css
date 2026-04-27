@@ -1,0 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+/* PAGE */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #FFFCFB;
+}
+
+/* PANEL */
+.login-right {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    position: relative;
+}
+
+/* HEADER */
+.header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-top h1 {
+    margin-bottom: 10px;
+}
+
+.form-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #5C3D1E;
+    letter-spacing: -0.4px;
+}
+
+.form-header p {
+    font-size: 14px;
+    letter-spacing: -0.3px;
+    color: #7A6050;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    border: none;
+    background: rgba(200, 138, 74, 0.12);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #5C3D1E;
+    margin-bottom: 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: #C88A4A;
+    color: #fff;
+    transform: translateX(-1px);
+}
+
+.back-btn .material-icons {
+    font-size: 18px;
+}
+
+/* ANCHORS (FIXED SIZE) */
+a {
+    color: #C88A4A;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+a:hover {
+    color: #5C3D1E;
+    text-decoration: underline;
+}
+
+/* GOOGLE BUTTON */
+.btn-google {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(200, 138, 74, 0.2);
+    background: #fff;
+    cursor: pointer;
+    margin-top: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-size: 14px;
+}
+
+.google-icon {
+    width: 19px;
+    height: 19px;
+}
+
+/* DIVIDER */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.divider p {
+    font-size: 14px;
+}
+
+.divider span {
+    flex: 1;
+    height: 1px;
+    background: rgba(200, 138, 74, 0.2);
+}
+
+/* INPUTS */
+.field-group {
+    margin-bottom: 15px;
+}
+
+.field-group label {
+    font-size: 13px;
+}
+
+.input-wrap {
+    position: relative;
+}
+
+.field-icon-left {
+    position: absolute;
+    left: 16px;
+    top: 55%;
+    transform: translateY(-45%);
+    color: #C88A4A;
+    font-size: 18px;
+}
+
+.input-wrap input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border-radius: 50px;
+    border: 1px solid rgba(200, 138, 74, 0.2);
+    font-size: 13px;
+    margin-top: 5px;
+    transition: border-color 0.2s;
+}
+
+.input-wrap input::placeholder {
+    color: #C4AD9A;
+    font-size: 13px;
+}
+
+.input-wrap input:focus {
+    border-color: #C88A4A;
+}
+
+/* META */
+.form-meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+}
+
+/* REMEMBER TEXT FIXED */
+.remember {
+    padding-left: 2px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+}
+
+/* BUTTON */
+.btn-login {
+    width: 100%;
+    padding: 10px;
+    border-radius: 50px;
+    background: #C88A4A;
+    color: white;
+    border: none;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-size: 15px;
+    font-weight: 500;
+}
