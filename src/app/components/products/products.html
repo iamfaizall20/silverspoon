@@ -43,6 +43,8 @@
                 <div class="flavour-card" *ngFor="let f of flavours; let i = index">
                     <div class="flavour-swatch" [style.background]="f.color">
                         <span class="swatch-letter">{{ f.name[0] }}</span>
+                        <!-- Unavailable overlay badge -->
+                        <span class="swatch-unavailable-badge" *ngIf="!f.is_active">Unavailable</span>
                         <div class="card-menu-wrap">
                             <button class="icon-btn icon-menu" (click)="toggleMenu('f-' + i, $event)" title="Options">
                                 <span class="material-icons">more_vert</span>
@@ -51,6 +53,10 @@
                                 <button class="dropdown-item" (click)="editFlavour(f, i); closeMenu()">
                                     <span class="material-icons">edit</span> Edit
                                 </button>
+                                <button class="dropdown-item" (click)="toggleFlavourAvailable(i); closeMenu()">
+                                    <span class="material-icons">{{ f.is_active ? 'cancel' : 'check_circle' }}</span>
+                                    {{ f.is_active ? 'Mark Unavailable' : 'Mark Available' }}
+                                </button>
                                 <button class="dropdown-item dropdown-danger" (click)="deleteFlavour(i); closeMenu()">
                                     <span class="material-icons">delete_outline</span> Delete
                                 </button>
@@ -58,7 +64,18 @@
                         </div>
                     </div>
                     <div class="flavour-card-body">
-                        <p class="flavour-name">{{ f.name }}</p>
+                        <div class="flavour-card-name-row">
+                            <p class="flavour-name">{{ f.name }}</p>
+                            <!-- Available toggle pill -->
+                            <button class="avail-toggle avail-toggle-sm" [class.avail-on]="f.is_active"
+                                (click)="toggleFlavourAvailable(i)"
+                                [title]="f.is_active ? 'Mark unavailable' : 'Mark available'">
+                                <span class="material-icons avail-icon">
+                                    {{ f.is_active ? 'check_circle' : 'cancel' }}
+                                </span>
+                                {{ f.is_active ? 'Available' : 'Unavailable' }}
+                            </button>
+                        </div>
                         <p class="flavour-hex">{{ f.color }}</p>
                     </div>
                 </div>
@@ -70,7 +87,7 @@
             </div>
         </div>
 
-        <!-- ══ ITEMS (Cups + Family Packs combined) ══ -->
+        <!-- ══ ITEMS (Cups + Packs combined, grouped by category) ══ -->
         <div class="tab-panel" [class.tab-panel-active]="activeTab === 'items'">
             <div class="table-wrap">
                 <table class="data-table">
@@ -78,60 +95,149 @@
                         <tr>
                             <th style="width:40px">#</th>
                             <th>Name</th>
-                            <th>Scoops</th>
+                            <th>Category</th>
+                            <th>Scoops / Servings</th>
                             <th>Price</th>
                             <th>Available</th>
                             <th style="width:60px"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let c of cupSizes; let i = index">
-                            <td class="cell-idx">{{ i + 1 }}</td>
-                            <td>
-                                <div class="name-cell">
-                                    <span class="material-icons name-icon">local_cafe</span>
-                                    <span class="cell-bold">{{ c.name }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="name-cell">
-                                    <span class="material-icons name-icon" style="font-size:15px">layers</span>
-                                    <span class="pill-neutral">{{ c.scoops }} scoop{{ c.scoops > 1 ? 's' : '' }}</span>
-                                </div>
-                            </td>
-                            <td class="cell-price">
-                                <span class="price-label">Rs. {{ c.price }}/-</span>
-                            </td>
-                            <td>
-                                <button class="avail-toggle" [class.avail-on]="c.is_active"
-                                    (click)="toggleCupAvailable(i)"
-                                    [title]="c.is_active ? 'Mark unavailable' : 'Mark available'">
-                                    <span class="material-icons avail-icon">
-                                        {{ c.is_active ? 'check_circle' : 'cancel' }}
+
+                        <!-- ── CUPS GROUP ── -->
+                        <ng-container *ngIf="cups.length > 0">
+                            <tr class="category-row">
+                                <td colspan="7">
+                                    <span class="category-label">
+                                        <span class="material-icons category-label-icon">local_cafe</span>
+                                        Cups
+                                        <span class="category-count">{{ cups.length }}</span>
                                     </span>
-                                    {{ c.is_active ? 'Available' : 'Unavailable' }}
-                                </button>
-                            </td>
-                            <td>
-                                <div class="menu-wrap">
-                                    <button class="icon-btn icon-menu" (click)="toggleMenu('c-' + i, $event)">
-                                        <span class="material-icons">more_vert</span>
-                                    </button>
-                                    <div class="dropdown-menu" [class.dropdown-open]="openMenuId === 'c-' + i">
-                                        <button class="dropdown-item" (click)="editCup(c, i); closeMenu()">
-                                            <span class="material-icons">edit</span> Edit
-                                        </button>
-                                        <button class="dropdown-item dropdown-danger"
-                                            (click)="deleteCup(i); closeMenu()">
-                                            <span class="material-icons">delete_outline</span> Delete
-                                        </button>
+                                </td>
+                            </tr>
+                            <tr *ngFor="let c of cups; let i = index">
+                                <td class="cell-idx">{{ i + 1 }}</td>
+                                <td>
+                                    <div class="name-cell">
+                                        <span class="material-icons name-icon">local_cafe</span>
+                                        <span class="cell-bold">{{ c.name }}</span>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td>
+                                    <span class="category-pill category-pill-cup">Cup</span>
+                                </td>
+                                <td>
+                                    <div class="name-cell">
+                                        <span class="material-icons name-icon" style="font-size:15px">layers</span>
+                                        <span class="pill-neutral">{{ c.scoops }} scoop{{ c.scoops > 1 ? 's' : ''
+                                            }}</span>
+                                    </div>
+                                </td>
+                                <td class="cell-price">
+                                    <span class="price-label">Rs. {{ c.price }}/-</span>
+                                </td>
+                                <td>
+                                    <button class="avail-toggle" [class.avail-on]="c.is_active"
+                                        (click)="toggleCupAvailable(getCupSizeIndex(c))"
+                                        [title]="c.is_active ? 'Mark unavailable' : 'Mark available'">
+                                        <span class="material-icons avail-icon">
+                                            {{ c.is_active ? 'check_circle' : 'cancel' }}
+                                        </span>
+                                        {{ c.is_active ? 'Available' : 'Unavailable' }}
+                                    </button>
+                                </td>
+                                <td>
+                                    <div class="menu-wrap">
+                                        <button class="icon-btn icon-menu"
+                                            (click)="toggleMenu('c-' + getCupSizeIndex(c), $event)">
+                                            <span class="material-icons">more_vert</span>
+                                        </button>
+                                        <div class="dropdown-menu"
+                                            [class.dropdown-open]="openMenuId === 'c-' + getCupSizeIndex(c)">
+                                            <button class="dropdown-item"
+                                                (click)="editCup(c, getCupSizeIndex(c)); closeMenu()">
+                                                <span class="material-icons">edit</span> Edit
+                                            </button>
+                                            <button class="dropdown-item dropdown-danger"
+                                                (click)="deleteCup(getCupSizeIndex(c)); closeMenu()">
+                                                <span class="material-icons">delete_outline</span> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+
+                        <!-- ── PACKS GROUP ── -->
+                        <ng-container *ngIf="packs.length > 0">
+                            <tr class="category-row">
+                                <td colspan="7">
+                                    <span class="category-label">
+                                        <span class="material-icons category-label-icon">inventory_2</span>
+                                        Family Packs
+                                        <span class="category-count">{{ packs.length }}</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr *ngFor="let c of packs; let i = index">
+                                <td class="cell-idx">{{ i + 1 }}</td>
+                                <td>
+                                    <div class="name-cell">
+                                        <span class="material-icons name-icon" style="color:#7A4E22">inventory_2</span>
+                                        <span class="cell-bold">{{ c.name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="category-pill category-pill-pack">Pack</span>
+                                </td>
+                                <!-- ✅ Packs show "serving(s)" instead of "scoop(s)" -->
+                                <td>
+                                    <div class="name-cell">
+                                        <span class="material-icons name-icon" style="font-size:15px">layers</span>
+                                        <span class="pill-neutral">{{ c.scoops }} serving{{ c.scoops > 1 ? 's' : ''
+                                            }}</span>
+                                    </div>
+                                </td>
+                                <td class="cell-price">
+                                    <span class="price-label">Rs. {{ c.price }}/-</span>
+                                </td>
+                                <td>
+                                    <button class="avail-toggle" [class.avail-on]="c.is_active"
+                                        (click)="toggleCupAvailable(getCupSizeIndex(c))"
+                                        [title]="c.is_active ? 'Mark unavailable' : 'Mark available'">
+                                        <span class="material-icons avail-icon">
+                                            {{ c.is_active ? 'check_circle' : 'cancel' }}
+                                        </span>
+                                        {{ c.is_active ? 'Available' : 'Unavailable' }}
+                                    </button>
+                                </td>
+                                <td>
+                                    <div class="menu-wrap">
+                                        <button class="icon-btn icon-menu"
+                                            (click)="toggleMenu('c-' + getCupSizeIndex(c), $event)">
+                                            <span class="material-icons">more_vert</span>
+                                        </button>
+                                        <div class="dropdown-menu"
+                                            [class.dropdown-open]="openMenuId === 'c-' + getCupSizeIndex(c)">
+                                            <button class="dropdown-item"
+                                                (click)="editCup(c, getCupSizeIndex(c)); closeMenu()">
+                                                <span class="material-icons">edit</span> Edit
+                                            </button>
+                                            <button class="dropdown-item dropdown-danger"
+                                                (click)="deleteCup(getCupSizeIndex(c)); closeMenu()">
+                                                <span class="material-icons">delete_outline</span> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+
+                        <!-- ── EMPTY ── -->
                         <tr *ngIf="cupSizes.length === 0">
-                            <td colspan="6" class="empty-row">No items configured yet.</td>
+                            <td colspan="7" class="empty-row">No items configured yet.</td>
                         </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -172,6 +278,22 @@
                     </span>
                 </div>
             </div>
+            <!-- AVAILABILITY TOGGLE -->
+            <div class="form-field">
+                <label>Availability</label>
+                <div class="avail-toggle-row">
+                    <button class="avail-toggle-large" [class.avail-on]="flavourForm.is_active"
+                        (click)="flavourForm.is_active = true" type="button">
+                        <span class="material-icons">check_circle</span>
+                        Available
+                    </button>
+                    <button class="avail-toggle-large" [class.avail-off-selected]="!flavourForm.is_active"
+                        (click)="flavourForm.is_active = false" type="button">
+                        <span class="material-icons">cancel</span>
+                        Unavailable
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn-secondary" (click)="closeModal()">Cancel</button>
@@ -190,13 +312,25 @@
             </button>
         </div>
         <div class="modal-body">
+            <!-- CATEGORY DROPDOWN -->
+            <div class="form-field">
+                <label>Category *</label>
+                <div class="select-wrap">
+                    <select [(ngModel)]="cupForm.category" class="form-select">
+                        <option value="cup">Cup</option>
+                        <option value="pack">Family Pack</option>
+                    </select>
+                    <span class="material-icons select-chevron">expand_more</span>
+                </div>
+            </div>
             <div class="form-row">
                 <div class="form-field">
                     <label>Item Name *</label>
                     <input type="text" [(ngModel)]="cupForm.name" placeholder="e.g. Large Cup">
                 </div>
+                <!-- ✅ Label switches between "Scoops" and "Servings" based on category -->
                 <div class="form-field">
-                    <label>Number of Scoops *</label>
+                    <label>{{ cupForm.category === 'pack' ? 'Number of Servings' : 'Number of Scoops' }} *</label>
                     <input type="number" [(ngModel)]="cupForm.scoops" min="1" max="10" placeholder="2">
                 </div>
             </div>

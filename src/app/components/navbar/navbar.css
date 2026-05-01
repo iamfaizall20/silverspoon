@@ -5,7 +5,6 @@
   right: 0;
   z-index: 100;
   background: #FFFCFB;
-  /* background: rgba(255, 249, 242, 0.92); */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(200, 138, 74, 0.15);
@@ -21,6 +20,7 @@
   height: 64px;
 }
 
+/* ── Brand ── */
 .nav-brand {
   display: flex;
   align-items: center;
@@ -46,6 +46,7 @@
   font-weight: 600;
 }
 
+/* ── Fallback action buttons ── */
 .nav-actions {
   display: flex;
   gap: 10px;
@@ -87,14 +88,212 @@
   border-color: #5C3D1E;
 }
 
-@media (max-width: 480px) {
+/* ── User Profile Trigger ── */
+.user-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 50px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.user-profile:hover,
+.user-profile.open {
+  background: rgba(200, 138, 74, 0.08);
+  border-color: rgba(200, 138, 74, 0.25);
+}
+
+/* Avatar circle with initial */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C88A4A, #5C3D1E);
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0;
+  box-shadow: 0 2px 8px rgba(200, 138, 74, 0.35);
+}
+
+/* Name text next to avatar */
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #5C3D1E;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: #C88A4A;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.user-profile.open .chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Dropdown Menu ── */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: #FFFCFB;
+  border: 1px solid rgba(200, 138, 74, 0.18);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 6px -1px rgba(92, 61, 30, 0.08),
+    0 16px 40px -4px rgba(92, 61, 30, 0.14);
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.97);
+  transform-origin: top right;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  pointer-events: none;
+}
+
+.user-profile.open .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* Dropdown header */
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 12px;
+}
+
+.dropdown-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C88A4A, #5C3D1E);
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(200, 138, 74, 0.35);
+}
+
+.dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dropdown-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #5C3D1E;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Divider */
+.dropdown-divider {
+  height: 1px;
+  background: rgba(200, 138, 74, 0.12);
+  margin: 4px 0;
+}
+
+/* Dropdown anchor items */
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: #5C3D1E;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  letter-spacing: -0.3px;
+  font-weight: 450;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dropdown-item svg {
+  color: #C88A4A;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.dropdown-item:hover {
+  background: rgba(200, 138, 74, 0.1);
+  color: #C88A4A;
+}
+
+.dropdown-item:hover svg {
+  color: #C88A4A;
+}
+
+/* Logout — red */
+.dropdown-item.logout {
+  color: #C0392B;
+}
+
+.dropdown-item.logout svg {
+  color: #C0392B;
+}
+
+.dropdown-item.logout:hover {
+  background: rgba(192, 57, 43, 0.08);
+  color: #C0392B;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
   .brand-name {
     font-size: 18px;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .user-profile {
+    padding: 5px 8px 5px 5px;
+    gap: 6px;
   }
 
   .btn-ghost,
   .btn-solid {
     padding: 8px 14px;
     font-size: 13px;
+  }
+
+  .dropdown-menu {
+    width: 200px;
+    right: -8px;
   }
 }

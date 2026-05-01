@@ -7,7 +7,8 @@ import { supabase } from '../supabase.client';
 export class MenuService {
 
   // ─────────────────────────────────────
-  // CUPS  (DB columns: id, name, scoops, price, is_active)
+  // CUPS  (DB columns: id, name, scoops, price, is_active, category)
+  // category values: 'cup' | 'pack'
   // ─────────────────────────────────────
 
   async getCups() {
@@ -20,7 +21,7 @@ export class MenuService {
     return data;
   }
 
-  async insertCup(cup: { name: string; scoops: number; price: number; is_active: boolean }) {
+  async insertCup(cup: { name: string; scoops: number; price: number; is_active: boolean; category: 'cup' | 'pack' }) {
     const { data, error } = await supabase
       .from('items')
       .insert([{ id: crypto.randomUUID(), ...cup }])
@@ -28,14 +29,17 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Error inserting cup:', error);
-      alert('Error while adding cup size');
+      console.error('Error inserting item:', error);
+      alert('Error while adding item');
       throw error;
     }
     return data;
   }
 
-  async updateCup(id: string | number, updates: { name?: string; scoops?: number; price?: number; is_active?: boolean }) {
+  async updateCup(
+    id: string | number,
+    updates: { name?: string; scoops?: number; price?: number; is_active?: boolean; category?: 'cup' | 'pack' }
+  ) {
     const { data, error } = await supabase
       .from('items')
       .update(updates)
@@ -44,8 +48,8 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Error updating cup:', error);
-      alert('Error while updating cup size');
+      console.error('Error updating item:', error);
+      alert('Error while updating item');
       throw error;
     }
     return data;
@@ -58,8 +62,8 @@ export class MenuService {
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting cup:', error);
-      alert('Error while deleting cup size');
+      console.error('Error deleting item:', error);
+      alert('Error while deleting item');
       throw error;
     }
   }
@@ -73,7 +77,7 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Error toggling cup availability:', error);
+      console.error('Error toggling item availability:', error);
       throw error;
     }
     return data;
@@ -92,10 +96,10 @@ export class MenuService {
     return data;
   }
 
-  async insertFlavour(flavour: { name: string; color: string }) {
+  async insertFlavour(flavour: { name: string; color: string; is_active?: boolean }) {
     const { data, error } = await supabase
       .from('flavours')
-      .insert([{ id: crypto.randomUUID(), ...flavour }])
+      .insert([flavour])
       .select()
       .single();
 
@@ -107,7 +111,7 @@ export class MenuService {
     return data;
   }
 
-  async updateFlavour(id: string | number, updates: { name?: string; color?: string }) {
+  async updateFlavour(id: string | number, updates: { name?: string; color?: string; is_active?: boolean }) {
     const { data, error } = await supabase
       .from('flavours')
       .update(updates)
@@ -118,6 +122,21 @@ export class MenuService {
     if (error) {
       console.error('Error updating flavour:', error);
       alert('Error while updating flavour');
+      throw error;
+    }
+    return data;
+  }
+
+  async toggleFlavourAvailable(id: string | number, is_active: boolean) {
+    const { data, error } = await supabase
+      .from('flavours')
+      .update({ is_active })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error toggling flavour availability:', error);
       throw error;
     }
     return data;
@@ -224,11 +243,6 @@ export class MenuService {
   // DASHBOARD
   // ─────────────────────────────────────
 
-  /**
-   * Returns KPI data for today:
-   * - todayRevenue, todayOrders, totalCustomers, avgOrderValue
-   * - yesterdayRevenue, yesterdayOrders for delta calculations
-   */
   async getDashboardKpis() {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -323,15 +337,10 @@ export class MenuService {
     };
   }
 
-  /**
-   * Returns daily revenue totals for the current week (Mon–today) and same days last week.
-   * Result: array of { day, thisWeek, lastWeek }
-   */
   async getWeeklyRevenue() {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
 
-    // Build last 7 calendar days (Sun…Sat or Mon…Sun)
     const days: { label: string; start: Date; end: Date }[] = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -347,7 +356,6 @@ export class MenuService {
       });
     }
 
-    // Last week same days
     const lastWeekDays = days.map(d => {
       const start = new Date(d.start);
       start.setDate(start.getDate() - 7);
@@ -398,10 +406,6 @@ export class MenuService {
     }));
   }
 
-  /**
-   * Returns cup/item sales breakdown for today.
-   * Result: array of { label, count, percent, color }
-   */
   async getTodayCupStats() {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -430,8 +434,6 @@ export class MenuService {
     }
 
     const total = Object.values(countMap).reduce((s, v) => s + v.count, 0);
-
-    // Colour palette matching the existing design tokens
     const palette = ['#B87333', '#D4956A', '#E8C4A0', '#F2DDD0', '#9A9088', '#7A4E22'];
 
     return Object.values(countMap)
@@ -444,10 +446,6 @@ export class MenuService {
       }));
   }
 
-  /**
-   * Returns top flavours by order frequency this week.
-   * Result: array of { name, color, percent }
-   */
   async getTopFlavours() {
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - 6);
@@ -490,10 +488,6 @@ export class MenuService {
       }));
   }
 
-  /**
-   * Returns the 7 most recent orders with fields needed by the dashboard table.
-   * Result: array of { id, customer, time, cup, amount, status }
-   */
   async getRecentOrders(limit = 7) {
     const { data, error } = await supabase
       .from('orders')
@@ -540,10 +534,6 @@ export class MenuService {
     });
   }
 
-  /**
-   * Returns aggregate flavour counts for the stats row in the Top Flavours card.
-   * Result: { activeFlavours, scoopsServedThisWeek, soldOutFlavours }
-   */
   async getFlavourStats() {
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - 6);

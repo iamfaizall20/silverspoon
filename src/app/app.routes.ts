@@ -11,6 +11,7 @@ import { Users } from './components/users/users';
 import { Newsletter } from './components/newsletter/newsletter';
 import { Offers } from './components/offers/offers';
 import { Settings } from './components/settings/settings';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
 
@@ -23,7 +24,7 @@ export const routes: Routes = [
 
     // Admin Pages
     {
-        path: 'admin', component: Adminlayout, children: [
+        path: 'admin', component: Adminlayout, canActivate: [authGuard], canActivateChild: [authGuard], children: [
             { path: 'dashboard', component: Dashboard },
             { path: 'orders', component: Orders },
             { path: 'products', component: Products },

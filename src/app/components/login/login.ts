@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service.ts';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class Login {
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
 
   email = '';
   password = '';
@@ -23,18 +24,43 @@ export class Login {
     this.showPassword = !this.showPassword;
   }
 
-  onLogin() {
-    if (!this.email || !this.password) return;
+  async onLogin() {
+    if (!this.email || !this.password || this.isLoading) return;
+    this.isLoading = true;
 
-    if (this.email === "admin" && this.password == "admin123") {
-      this.isLoading = true;
+    try {
+      // 1. Sign in via Supabase Auth
+      const res = await this.authService.login(this.email.trim(), this.password);
+      const uid = res.user?.id;
 
-      setTimeout(() => {
-        this.isLoading = false;
-        this.router.navigate(['/admin'])
-      }, 2000);
-    } else {
-      alert("Invalid email or password");
+      // 2. Fetch name from profiles table
+      let name = '';
+      if (uid) {
+        const profile = await this.authService.getUserProfile(uid);
+        name = profile?.name ?? '';
+        console.log('Name from profile:', name); // ← remove after confirming
+      }
+
+      // 3. Store in localStorage
+      localStorage.setItem('user', JSON.stringify({
+        name,
+        email: this.email.trim(),
+        isLoggedIn: true,
+      }));
+
+      console.log('Stored in localStorage:', { name, email: this.email.trim(), isLoggedIn: true });
+
+      this.router.navigate(['/']);
+
+    } catch (err: any) {
+      console.error(err);
+      if (err.message?.includes('Invalid login credentials')) {
+        alert('Invalid email or password ❌');
+      } else {
+        alert(err.message || 'Login failed');
+      }
+    } finally {
+      this.isLoading = false;
     }
   }
 

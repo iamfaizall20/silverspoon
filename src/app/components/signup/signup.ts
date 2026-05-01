@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service.ts';
 
 @Component({
   selector: 'app-signup',
@@ -11,8 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class Signup {
 
-  constructor(private router: Router) { }
-
+  constructor(private router: Router, private authservice: AuthService) { }
 
   fullName = '';
   email = '';
@@ -47,23 +47,30 @@ export class Signup {
   togglePassword() { this.showPassword = !this.showPassword; }
   toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; }
 
-  onSignup() {
-    if (!this.formValid) return;
-
-    const user: any = {
-      username: this.fullName,
-      email: this.email,
-      password: this.password
-    }
-
-    localStorage.setItem('user', JSON.stringify(user));
+  async onSignup() {
+    if (!this.formValid || this.isLoading) return;
 
     this.isLoading = true;
-    setTimeout(() => {
-      this.isLoading = false
-      this.router.navigate(['/login']);
-    }, 1000);
 
+    try {
+      const user = await this.authservice.signUp(
+        this.email.trim(),
+        this.password,
+        this.fullName.trim()
+      );
+
+      alert("Signup successful 🎉");
+      this.router.navigate(['/login']);
+
+    } catch (err: any) {
+      if (err.message.includes('rate limit')) {
+        alert("Too many attempts. Please wait a moment ⏳");
+      } else {
+        alert(err.message);
+      }
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   onGoogleSignup() { }

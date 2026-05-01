@@ -11,15 +11,15 @@ export interface Flavour {
   is_active: boolean;
 }
 
-// ── Matches DB: cups (id, name, scoops, price, is_active)
-// NOTE: There is no separate family_packs table. Both Cups and
-// Family Packs tabs read from the same `cups` table.
+// ── Matches DB: items (id, name, scoops, price, is_active, category)
+// category is either 'cup' or 'pack'
 export interface CupSize {
   id: string;
-  name: string;       // DB: name  (was "label" before — now fixed)
+  name: string;
   scoops: number;
-  price: number;      // DB: price (was missing before — now fixed)
-  is_active: boolean; // DB: is_active (was "available" before — now fixed)
+  price: number;
+  is_active: boolean;
+  category: 'cup' | 'pack';
 }
 
 type TabType = 'flavours' | 'items';
@@ -65,13 +65,27 @@ export class Products implements OnInit {
 
   // ── FORM MODELS ──
   flavourForm: Omit<Flavour, 'id'> = { name: '', color: '#F5E6C8', is_active: true };
-  cupForm: Omit<CupSize, 'id'> = { name: '', scoops: 1, price: 0, is_active: true };
+  cupForm: Omit<CupSize, 'id'> = { name: '', scoops: 1, price: 0, is_active: true, category: 'cup' };
 
   quickColors = [
     '#F5E6C8', '#FFD580', '#F4A0A0', '#A8C5A0',
     '#80CBC4', '#9BA8D0', '#DEB887', '#7B4F2E',
     '#C8E6C9', '#FFCCBC', '#CE93D8', '#B0BEC5',
   ];
+
+  // ── DERIVED: items split by category ──
+  get cups(): CupSize[] {
+    return this.cupSizes.filter(c => c.category === 'cup');
+  }
+
+  get packs(): CupSize[] {
+    return this.cupSizes.filter(c => c.category === 'pack');
+  }
+
+  /** Returns the index of a CupSize in the master cupSizes array. */
+  getCupSizeIndex(item: CupSize): number {
+    return this.cupSizes.indexOf(item);
+  }
 
   ngOnInit(): void {
     this.loadFlavours();
@@ -115,7 +129,7 @@ export class Products implements OnInit {
   // ── MODAL HELPERS ──
   openAddModal(): void {
     if (this.activeTab === 'flavours') this.openFlavourModal();
-    else this.openCupModal(); // items tab opens cup modal
+    else this.openCupModal();
   }
 
   closeModal(): void {
@@ -156,15 +170,35 @@ export class Products implements OnInit {
     try {
       if (this.editIndex >= 0) {
         const id = this.flavours[this.editIndex].id;
-        await this.menuService.updateFlavour(id, { name: this.flavourForm.name, color: this.flavourForm.color });
+        await this.menuService.updateFlavour(id, {
+          name: this.flavourForm.name,
+          color: this.flavourForm.color,
+          is_active: this.flavourForm.is_active,
+        });
         this.flavours[this.editIndex] = { ...this.flavours[this.editIndex], ...this.flavourForm };
         this.showToast(`Flavour "${this.flavourForm.name}" updated.`);
       } else {
-        const newFlavour = await this.menuService.insertFlavour({ name: this.flavourForm.name, color: this.flavourForm.color });
+        const newFlavour = await this.menuService.insertFlavour({
+          name: this.flavourForm.name,
+          color: this.flavourForm.color,
+          is_active: this.flavourForm.is_active,
+        });
         this.flavours.push(newFlavour);
         this.showToast(`Flavour "${this.flavourForm.name}" added.`);
       }
       this.closeModal();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async toggleFlavourAvailable(i: number): Promise<void> {
+    const flavour = this.flavours[i];
+    const newVal = !flavour.is_active;
+    try {
+      await this.menuService.toggleFlavourAvailable(flavour.id, newVal);
+      this.flavours[i].is_active = newVal;
+      this.showToast(`"${flavour.name}" marked as ${newVal ? 'available' : 'unavailable'}.`);
     } catch (err) {
       console.error(err);
     }
@@ -191,14 +225,14 @@ export class Products implements OnInit {
   }
 
   openCupModal(): void {
-    this.cupForm = { name: '', scoops: 1, price: 0, is_active: true };
+    this.cupForm = { name: '', scoops: 1, price: 0, is_active: true, category: 'cup' };
     this.editIndex = -1;
     this.modalType = 'cup';
     this.modalOpen = true;
   }
 
   editCup(c: CupSize, i: number): void {
-    this.cupForm = { name: c.name, scoops: c.scoops, price: c.price, is_active: c.is_active };
+    this.cupForm = { name: c.name, scoops: c.scoops, price: c.price, is_active: c.is_active, category: c.category };
     this.editIndex = i;
     this.modalType = 'cup';
     this.modalOpen = true;
