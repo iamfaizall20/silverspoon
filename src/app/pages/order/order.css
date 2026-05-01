@@ -1,3 +1,8 @@
+/* ─────────────────────────────────────────
+   ORDER COMPONENT — FULLY RESPONSIVE CSS
+   Breakpoints: 768px (tablet), 480px (mobile)
+───────────────────────────────────────── */
+
 /* ─── PAGE ─── */
 .order-page {
     min-height: 100vh;
@@ -225,10 +230,13 @@
     resize: none;
     margin-bottom: 5px;
     outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #1A1610;
 }
 
 .field textarea:focus {
-    border: 1.3px solid#B87333;
+    border: 1.3px solid #B87333;
     background: #fff;
     box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.12);
 }
@@ -241,10 +249,6 @@
     border-color: #B87333;
     background: #fff;
     box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.12);
-}
-
-.identity-left .field input {
-    border-radius: 12px;
 }
 
 /* ─── LABELS / HINTS ─── */
@@ -331,6 +335,7 @@
     height: 30px;
     border-radius: 50%;
     border: 1.5px solid rgba(30, 25, 20, 0.28);
+    background: transparent;
     color: #5A5248;
     cursor: pointer;
     display: flex;
@@ -453,7 +458,7 @@
 
 /* ── PRICE LIST ── */
 .price-list {
-    margin-top: 45px;
+    margin-top: 0;
     border: 1.5px solid rgba(30, 25, 20, 0.28);
     border-radius: 18px;
     overflow: hidden;
@@ -955,4 +960,252 @@
     opacity: 0.45;
     cursor: not-allowed;
     transform: none;
+}
+
+/* ═══════════════════════════════════════════
+   TABLET — ≤ 768px
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+    .order-page {
+        padding: 16px 20px 32px;
+    }
+
+    .header-text {
+        font-size: 24px;
+    }
+
+    /* Progress: shrink circles + hide labels */
+    .order-progress {
+        padding: 14px 18px;
+        border-radius: 24px;
+    }
+
+    .progress .number {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .progress .label {
+        font-size: 10px;
+    }
+
+    .seperator {
+        margin: 0 6px;
+        margin-bottom: 14px;
+    }
+
+    /* Form */
+    .order-form {
+        padding: 24px 20px;
+        border-radius: 22px;
+    }
+
+    /* Identity: stack columns */
+    .identity-section {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .identity-right,
+    .identity-left {
+        gap: 14px;
+    }
+
+    .identity-left {
+        margin-top: 14px;
+    }
+
+    /* Ice cream: stack columns */
+    .icecream-section {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Move price list above the selectors on tablet — it becomes a summary strip */
+    .icecream-right {
+        order: -1;
+    }
+
+    .price-list {
+        margin-top: 0;
+    }
+
+    /* Price table compact */
+    .price-table th,
+    .price-table td {
+        padding: 8px 12px;
+    }
+
+    /* Footer buttons full width */
+    .form-footer {
+        justify-content: stretch;
+    }
+
+    .btns {
+        width: 100%;
+    }
+
+    .cancel-btn,
+    .confirm {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE — ≤ 480px
+═══════════════════════════════════════════ */
+@media (max-width: 480px) {
+
+    .order-page {
+        padding: 12px 14px 28px;
+    }
+
+    .header-text {
+        font-size: 20px;
+        letter-spacing: -0.3px;
+    }
+
+    .header-para {
+        font-size: 12px;
+    }
+
+    /* Progress: hide labels entirely, tiny circles */
+    .order-progress {
+        padding: 12px 14px;
+        border-radius: 20px;
+        margin-bottom: 14px;
+    }
+
+    .progress .number {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+
+    .progress .label {
+        display: none;
+    }
+
+    .seperator {
+        margin: 0 4px;
+        margin-bottom: 0;
+    }
+
+    /* Form */
+    .order-form {
+        padding: 18px 14px;
+        border-radius: 18px;
+        margin-bottom: 14px;
+    }
+
+    /* Fields */
+    .field input,
+    .field textarea {
+        font-size: 14px;
+        /* larger tap targets */
+        padding: 12px 14px;
+    }
+
+    .field label {
+        font-size: 11px;
+    }
+
+    /* Cup rows */
+    .cup-row {
+        padding: 10px 12px;
+        border-radius: 14px;
+    }
+
+    .cup-name {
+        font-size: 12px;
+    }
+
+    .cup-meta {
+        font-size: 10px;
+    }
+
+    .qty-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .qty-val {
+        font-size: 14px;
+        min-width: 18px;
+    }
+
+    /* Flavour chips */
+    .flavour-chip {
+        padding: 6px 11px;
+        font-size: 11px;
+    }
+
+    /* Price table — hide scoops/servings column, show only name & price */
+    .price-table th:nth-child(2),
+    .price-table td:nth-child(2) {
+        display: none;
+    }
+
+    .price-table th,
+    .price-table td {
+        padding: 8px 10px;
+    }
+
+    /* Payment */
+    .payment-option {
+        padding: 13px 14px;
+        gap: 10px;
+        border-radius: 14px;
+    }
+
+    .payment-option-info .name {
+        font-size: 12px;
+    }
+
+    .payment-option-info .desc {
+        font-size: 11px;
+    }
+
+    .payment-icon {
+        font-size: 18px;
+    }
+
+    /* Receipt */
+    .receipt {
+        max-width: 100%;
+    }
+
+    .receipt-inner {
+        padding: 4px 16px 14px;
+        font-size: 11px;
+    }
+
+    .receipt-shop-name {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    .receipt-grand-total {
+        font-size: 14px !important;
+    }
+
+    /* Footer buttons */
+    .cancel-btn,
+    .confirm {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+
+    /* Success box */
+    .success-box {
+        padding: 32px 22px;
+        border-radius: 20px;
+    }
+
+    .success-box h2 {
+        font-size: 19px;
+    }
 }
