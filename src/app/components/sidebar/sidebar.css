@@ -1,5 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap');
 
+/* ─── HAMBURGER BUTTON (mobile only) ─── */
+.hamburger {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1100;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #5C3D1E;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(92, 61, 30, 0.35);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.hamburger:hover {
+    background: #7A5230;
+    transform: scale(1.05);
+}
+
+.hamburger .material-icons {
+    color: #fff;
+    font-size: 22px;
+    transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+/* ─── OVERLAY (mobile only) ─── */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(40, 22, 8, 0.45);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.visible {
+    opacity: 1;
+}
+
 /* ─── SIDEBAR SHELL ─── */
 .sidebar {
     width: 220px;
@@ -12,6 +58,9 @@
     font-family: 'DM Sans', sans-serif;
     position: sticky;
     top: 0;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.35s ease;
+    z-index: 1000;
 }
 
 /* ─── BRAND ─── */
@@ -214,4 +263,41 @@
 
 .logout-label {
     flex: 1;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+
+    /* Show hamburger */
+    .hamburger {
+        display: flex;
+    }
+
+    /* Show overlay */
+    .sidebar-overlay {
+        display: block;
+    }
+
+    /* Sidebar slides in from left */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        box-shadow: none;
+        min-height: 100dvh;
+    }
+
+    /* Open state */
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 8px 0 40px rgba(92, 61, 30, 0.18);
+    }
+
+    /* Push brand down so it doesn't sit under the hamburger */
+    .sidebar-brand {
+        padding-top: 22px;
+        padding-left: 22px;
+    }
 }

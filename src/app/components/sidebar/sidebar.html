@@ -1,4 +1,13 @@
-<div class="sidebar">
+<!-- Hamburger (mobile only) -->
+<button class="hamburger" (click)="toggleSidebar()" aria-label="Toggle menu">
+    <span class="material-icons">{{ isOpen ? 'close' : 'menu' }}</span>
+</button>
+
+<!-- Overlay (mobile only) -->
+<div class="sidebar-overlay" [class.visible]="isOpen" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" [class.open]="isOpen">
 
     <!-- Brand -->
     <div class="sidebar-brand">

@@ -1,6 +1,19 @@
 import { Injectable } from '@angular/core';
 import { supabase } from '../supabase.client';
 
+export interface UserProfile {
+  name: string;
+  role: 'user' | 'admin';
+}
+
+export interface StoredUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'user' | 'admin';
+  isLoggedIn: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -20,7 +33,7 @@ export class AuthService {
         .insert({
           id: data.user.id,
           name: name,
-          role: 'user'
+          role: 'user',
         });
 
       if (profileError) {
@@ -39,18 +52,18 @@ export class AuthService {
   }
 
   async logout() {
+    localStorage.removeItem('user');
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   }
 
   /**
-   * Fetches only 'name' from profiles table — matches your insert schema (id, name, role).
-   * Email is not stored in profiles, so we don't select it here.
+   * Fetches name + role from profiles table.
    */
-  async getUserProfile(uid: string): Promise<{ name: string } | null> {
+  async getUserProfile(uid: string): Promise<UserProfile | null> {
     const { data, error } = await supabase
       .from('profiles')
-      .select('name')       // only select what actually exists in the table
+      .select('name, role')
       .eq('id', uid)
       .single();
 
@@ -59,7 +72,27 @@ export class AuthService {
       return null;
     }
 
-    console.log('Profile fetched:', data); // ← remove after confirming it works
-    return data;
+    return data as UserProfile;
+  }
+
+  /**
+   * Returns the currently stored user from localStorage, or null.
+   */
+  getStoredUser(): StoredUser | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as StoredUser;
+    } catch {
+      return null;
+    }
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getStoredUser()?.isLoggedIn;
+  }
+
+  isAdmin(): boolean {
+    return this.getStoredUser()?.role === 'admin';
   }
 }

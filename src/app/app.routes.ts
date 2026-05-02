@@ -11,9 +11,10 @@ import { Users } from './components/users/users';
 import { Newsletter } from './components/newsletter/newsletter';
 import { Offers } from './components/offers/offers';
 import { Settings } from './components/settings/settings';
-import { authGuard } from './guards/auth-guard';
+import { authGuard } from './guards/auth-guard'; // ← new
 import { Myorders } from './pages/myorders/myorders';
 import { Profile } from './pages/profile/profile';
+import { adminGuard } from './guards/admin-guard-guard';
 
 export const routes: Routes = [
 
@@ -22,13 +23,17 @@ export const routes: Routes = [
     { path: 'home', component: Landingpage },
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
-    { path: 'order/new', component: Order },
-    { path: 'order/status', component: Myorders },
-    { path: 'profile', component: Profile },
+    { path: 'order/new', component: Order, canActivate: [authGuard] },
+    { path: 'order/status', component: Myorders, canActivate: [authGuard] },
+    { path: 'profile', component: Profile, canActivate: [authGuard] },
 
     // Admin Pages
     {
-        path: 'admin', component: Adminlayout, canActivate: [authGuard], canActivateChild: [authGuard], children: [
+        path: 'admin',
+        component: Adminlayout,
+        canActivate: [adminGuard],
+        canActivateChild: [adminGuard],
+        children: [
             { path: 'dashboard', component: Dashboard },
             { path: 'orders', component: Orders },
             { path: 'products', component: Products },
@@ -36,8 +41,10 @@ export const routes: Routes = [
             { path: 'newsletter', component: Newsletter },
             { path: 'offers', component: Offers },
             { path: 'settings', component: Settings },
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+        ],
+    },
 
-        ]
-    }
+    // Fallback
+    { path: '**', redirectTo: 'home' },
 ];

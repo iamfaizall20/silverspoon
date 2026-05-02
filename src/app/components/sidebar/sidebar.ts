@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service.ts';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,27 +13,54 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 export class Sidebar implements OnInit {
 
   activeLink: string = 'dashboard';
-
-  // Example: replace with real service call
   pendingOrders: number = 5;
+  isOpen: boolean = false;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
 
   ngOnInit(): void {
-    // Sync active link with current route on load
-    const url = this.router.url;
+    // Sync active link on initial load
+    this.syncActiveLink(this.router.url);
+
+    // Auto-close sidebar on route change (mobile nav tap)
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe((e: any) => {
+        this.syncActiveLink(e.urlAfterRedirects);
+        this.closeSidebar();
+      });
+  }
+
+  private syncActiveLink(url: string): void {
     const segments = url.split('/');
     this.activeLink = segments[segments.length - 1] || 'dashboard';
+  }
+
+  toggleSidebar(): void {
+    this.isOpen = !this.isOpen;
+  }
+
+  closeSidebar(): void {
+    this.isOpen = false;
   }
 
   setActive(link: string): void {
     this.activeLink = link;
   }
 
-  logout(): void {
-    // Clear session/token here, e.g.:
-    // localStorage.removeItem('token');
-    // this.authService.logout();
-    this.router.navigate(['/login']);
+  // Close sidebar on Escape key
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeSidebar();
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.authService.logout();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      this.router.navigate(['/login']);
+    }
   }
 }

@@ -33,24 +33,30 @@ export class Login {
       const res = await this.authService.login(this.email.trim(), this.password);
       const uid = res.user?.id;
 
-      // 2. Fetch name from profiles table
-      let name = '';
-      if (uid) {
-        const profile = await this.authService.getUserProfile(uid);
-        name = profile?.name ?? '';
-        console.log('Name from profile:', name); // ← remove after confirming
-      }
+      if (!uid) throw new Error('Login failed: no user returned.');
 
-      // 3. Store in localStorage
-      localStorage.setItem('user', JSON.stringify({
-        name,
+      // 2. Fetch name + role from profiles table
+      const profile = await this.authService.getUserProfile(uid);
+
+      if (!profile) throw new Error('Could not load user profile.');
+
+      // 3. Persist full user object (including role) to localStorage
+      const storedUser = {
+        id: uid,
+        name: profile.name,
         email: this.email.trim(),
+        role: profile.role,      // ← 'user' | 'admin'
         isLoggedIn: true,
-      }));
+      };
 
-      console.log('Stored in localStorage:', { name, email: this.email.trim(), isLoggedIn: true });
+      localStorage.setItem('user', JSON.stringify(storedUser));
 
-      this.router.navigate(['/']);
+      // 4. Role-based redirect
+      if (profile.role === 'admin') {
+        this.router.navigate(['/admin']);
+      } else {
+        this.router.navigate(['/']);
+      }
 
     } catch (err: any) {
       console.error(err);
