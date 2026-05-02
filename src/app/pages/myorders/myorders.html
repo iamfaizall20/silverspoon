@@ -1,0 +1,122 @@
+<div class="track-page">
+
+    <!-- Header -->
+    <div class="page-header">
+        <button class="back-btn" routerLink="/home">
+            <span class="material-icons">arrow_back</span>
+        </button>
+        <div>
+            <h1 class="page-title">Track Your Order</h1>
+            <p class="page-sub">Enter your order ID to check the status</p>
+        </div>
+    </div>
+
+    <!-- Search box -->
+    <div class="search-card">
+        <div class="input-row">
+            <span class="input-prefix">#</span>
+            <input class="order-input" type="text" placeholder="e.g. ORD-136871" [(ngModel)]="orderId"
+                (keydown.enter)="trackOrder()" />
+            <button class="btn-track" (click)="trackOrder()" [disabled]="loading()">
+                @if (loading()) {
+                <span class="btn-spinner"></span>
+                } @else {
+                Track
+                }
+            </button>
+        </div>
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+    <div class="error-box">
+        <span>😕</span> {{ error() }}
+    </div>
+    }
+
+    <!-- Result -->
+    @if (order()) {
+    <div class="result-card">
+
+        <!-- Order meta -->
+        <div class="result-header">
+            <div>
+                <div class="result-id">Order #{{ order()!.id }}</div>
+                <div class="result-date">{{ formatDate(order()!.order_date) }}</div>
+                <div class="result-customer">{{ order()!.customer_name }}</div>
+            </div>
+            <div class="result-right">
+                <span class="badge" [ngClass]="statusBadgeClass(order()!.status)">
+                    {{ statusLabel(order()!.status) }}
+                </span>
+                <div class="result-total">Rs {{ order()!.total | number }}</div>
+            </div>
+        </div>
+
+        <!-- Refresh -->
+        <button class="btn-refresh" (click)="trackOrder()" [disabled]="loading()">
+            <span class="material-icons refresh-icon" [class.spinning]="loading()">refresh</span>
+            {{ loading() ? 'Refreshing…' : 'Refresh Status' }}
+        </button>
+
+        <!-- Status tracker -->
+        @if (order()!.status === 'new') {
+        <div class="new-banner">
+            <span class="material-icons">hourglass_empty</span> Your order is awaiting acceptance by the store.
+        </div>
+        }
+        @if (order()!.status !== 'cancelled' && order()!.status !== 'new') {
+        <div class="tracker">
+            @for (step of statusSteps; track step.key; let i = $index; let last = $last) {
+            <div class="track-step" [class.done]="isStepDone(order()!.status, step.key)"
+                [class.active]="isStepActive(order()!.status, step.key)">
+                <div class="step-circle">
+                    @if (isStepDone(order()!.status, step.key)) {
+                    <span class="material-icons step-mat-icon">{{ step.icon }}</span>
+                    } @else {
+                    <span class="step-num">{{ i + 1 }}</span>
+                    }
+                </div>
+                <div class="step-label">{{ step.label }}</div>
+                @if (!last) {
+                <div class="step-line" [class.filled]="isStepDone(order()!.status, nextStepKey(i))"></div>
+                }
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="cancelled-banner">
+            <span class="material-icons">cancel</span> This order was cancelled
+        </div>
+        }
+
+        <!-- Items -->
+        <div class="section-title">Items</div>
+        <div class="items-list">
+            @for (oi of order()!.order_items; track oi.items?.name) {
+            <div class="item-row">
+                <span class="item-name">{{ oi.items?.name }}</span>
+                <span class="item-meta">{{ oi.items?.scoops }} scoop{{ oi.items?.scoops !== 1 ? 's' : '' }}</span>
+                <span class="item-qty">× {{ oi.quantity }}</span>
+                <span class="item-price">Rs {{ oi.price_at_time * oi.quantity | number }}</span>
+            </div>
+            }
+        </div>
+
+        <!-- Flavours -->
+        @if ((order()!.order_flavours ?? []).length > 0) {
+        <div class="section-title">Flavours</div>
+        <div class="flavour-chips">
+            @for (of of order()!.order_flavours; track of.flavours?.name) {
+            <span class="flavour-chip">{{ of.flavours?.name }}</span>
+            }
+        </div>
+        }
+
+        <!-- Track another -->
+        <button class="btn-reset" (click)="reset()">Track Another Order</button>
+
+    </div>
+    }
+
+</div>

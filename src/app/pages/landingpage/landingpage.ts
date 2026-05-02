@@ -6,10 +6,41 @@ import { Navbar } from '../../components/navbar/navbar';
 import { Router } from '@angular/router';
 import { MenuService } from '../../services/menu.service.ts';
 
-export interface flavour {
+export interface Flavour {
+  id: string;
   name: string;
   color: string;
+  is_active: boolean;
 }
+
+export interface Item {
+  id: string;
+  name: string;
+  scoops: string;
+  price: number;
+  is_active: boolean;
+  category: 'cup' | 'pack';
+}
+
+// icon + color mappings for cups (keyed by id)
+const CUP_STYLES: Record<string, { icon: string; color: string; lightBg: string }> = {
+  'extra-small': { icon: 'icecream', color: '#E67E00', lightBg: '#FFF3E0' },
+  'small': { icon: 'local_cafe', color: '#C2185B', lightBg: '#FCE4EC' },
+  'medium': { icon: 'emoji_food_beverage', color: '#1565C0', lightBg: '#E3F2FD' },
+  'large-plain': { icon: 'sports_bar', color: '#6A1B9A', lightBg: '#F3E5F5' },
+  'large-falooda': { icon: 'celebration', color: '#2E7D32', lightBg: '#E8F5E9' },
+};
+
+const PACK_STYLES: Record<string, { icon: string; color: string; lightBg: string; badge: string }> = {
+  'half-liter': { icon: 'water_drop', color: '#0277BD', lightBg: '#E1F5FE', badge: 'Starter' },
+  'one-liter': { icon: 'opacity', color: '#00796B', lightBg: '#E0F2F1', badge: 'Popular' },
+  'one-and-half-liter': { icon: 'inventory_2', color: '#E67E00', lightBg: '#FFF3E0', badge: 'Value' },
+  'ea372631-1537-4ff7-9f61-20e954027cef': { icon: 'kitchen', color: '#5C3D1E', lightBg: '#FDF3E7', badge: 'XL' },
+};
+
+// fallback defaults for unknown ids
+const CUP_DEFAULT = { icon: 'icecream', color: '#C88A4A', lightBg: '#FDF3E7' };
+const PACK_DEFAULT = { icon: 'kitchen', color: '#5C3D1E', lightBg: '#FDF3E7', badge: 'Pack' };
 
 @Component({
   selector: 'app-landingpage',
@@ -22,12 +53,16 @@ export class Landingpage {
   constructor(private router: Router, private menuService: MenuService) { }
 
   ngOnInit() {
-    this.getFlavours();
+    this.loadData();
   }
 
   activeTab: 'cups' | 'packs' = 'cups';
   newsletterEmail = '';
   subscribed = false;
+
+  flavours: Flavour[] = [];
+  cups: any[] = [];
+  packs: any[] = [];
 
   onSubscribe() {
     if (this.newsletterEmail) {
@@ -37,32 +72,43 @@ export class Landingpage {
     }
   }
 
-  flavours: flavour[] = [];
+  async loadData() {
+    await Promise.all([this.getFlavours(), this.getItems()]);
+  }
 
-  cups = [
-    { name: 'Extra Small Cup', icon: 'icecream', color: '#E67E00', lightBg: '#FFF3E0', scoops: '1 Scoop', desc: 'Perfect solo treat', price: 100 },
-    { name: 'Small Cup', icon: 'local_cafe', color: '#C2185B', lightBg: '#FCE4EC', scoops: '2 Scoops', desc: 'Classic everyday pick', price: 130 },
-    { name: 'Medium Cup', icon: 'emoji_food_beverage', color: '#1565C0', lightBg: '#E3F2FD', scoops: '3 Scoops', desc: 'For the big appetite', price: 180 },
-    { name: 'Large Cup plain', icon: 'sports_bar', color: '#6A1B9A', lightBg: '#F3E5F5', scoops: '4 Scoops', desc: 'Go all out', price: 250 },
-    { name: 'Large Cup + Falooda', icon: 'celebration', color: '#2E7D32', lightBg: '#E8F5E9', scoops: '4 Scoops + Falooda', desc: "Share or don't — no judgment", price: 290 },
-  ];
-
-  packs = [
-    { name: 'Half Litre', icon: 'water_drop', color: '#0277BD', lightBg: '#E1F5FE', badge: 'Starter', desc: '2–3 servings · any 2 flavours', price: 350 },
-    { name: '1 Litre', icon: 'opacity', color: '#00796B', lightBg: '#E0F2F1', badge: 'Popular', desc: '4–5 servings · any 3 flavours', price: 620 },
-    { name: '1.5 Litre', icon: 'inventory_2', color: '#E67E00', lightBg: '#FFF3E0', badge: 'Value', desc: '6–8 servings · any 4 flavours', price: 880 },
-  ];
-
-  // get Flavours
   async getFlavours() {
     try {
       const data = await this.menuService.getFlavours();
-      this.flavours = (data as flavour[]) ?? [];
+      this.flavours = ((data as Flavour[]) ?? []).filter(f => f.is_active);
     } catch (err) {
-      throw err;
+      console.error('Error loading flavours:', err);
     }
   }
 
+  async getItems() {
+    try {
+      const data = (await this.menuService.getCups()) as Item[];
+      const active = data.filter(i => i.is_active);
+
+      this.cups = active
+        .filter(i => i.category === 'cup')
+        .map(i => ({
+          ...i,
+          ...(CUP_STYLES[i.id] ?? CUP_DEFAULT),
+        }));
+
+      this.packs = active
+        .filter(i => i.category === 'pack')
+        .map(i => ({
+          ...i,
+          ...(PACK_STYLES[i.id] ?? PACK_DEFAULT),
+          desc: i.scoops,   // reuse scoops field as description for packs
+        }));
+
+    } catch (err) {
+      console.error('Error loading items:', err);
+    }
+  }
 
   onOrder() {
     this.router.navigate(['/order/new']);

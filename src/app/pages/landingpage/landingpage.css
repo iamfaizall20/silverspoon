@@ -40,8 +40,20 @@
     height: 90vh;
     overflow: hidden;
     position: relative;
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
     z-index: 1;
+}
+
+.hero-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: #FFFCFB;
+    clip-path: ellipse(55% 100% at 50% 100%);
+    z-index: 2;
+    pointer-events: none;
 }
 
 .hero-banner img {
@@ -60,6 +72,7 @@
             rgba(0, 0, 0, 0.62) 0%,
             rgba(30, 15, 5, 0.75) 50%,
             rgba(0, 0, 0, 0.68) 100%);
+    z-index: 1;
 }
 
 /* extra dark vignette layer — edges darker than center */
@@ -609,6 +622,15 @@
     transform: scale(1.05);
 }
 
+.empty-state {
+    font-size: 14px;
+    color: #9A9088;
+    letter-spacing: -0.3px;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 0;
+}
+
 
 /* ══════════════════════════════════════
    NEWSLETTER
@@ -872,7 +894,10 @@
 @media (max-width: 600px) {
     .hero-banner {
         height: 100vh;
-        clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+    }
+
+    .hero-banner::after {
+        height: 60px;
     }
 
     .hero-content {

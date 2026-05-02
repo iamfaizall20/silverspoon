@@ -1,0 +1,176 @@
+<app-navbar></app-navbar>
+
+<section class="profile-page">
+
+    <!-- ── DECORATIVE BLOBS ── -->
+    <div class="profile-deco profile-deco-1"></div>
+    <div class="profile-deco profile-deco-2"></div>
+
+    <div class="profile-container">
+
+        <!-- ══ BACK BUTTON ══ -->
+        <button class="back-btn" (click)="goBack()">
+            <span class="material-icons">arrow_back</span>
+        </button>
+
+        <!-- ══ HEADER CARD ══ -->
+        <div class="profile-header-card">
+            <div class="profile-avatar">
+                <span class="avatar-letter">{{ user?.name?.[0]?.toUpperCase() || '?' }}</span>
+            </div>
+            <div class="profile-header-info">
+                <h1 class="profile-name">{{ user?.name || 'Loading…' }}</h1>
+                <p class="profile-email">{{ user?.email || '' }}</p>
+                <span class="profile-badge">
+                    <span class="material-icons" style="font-size:13px;">verified</span>
+                    Customer
+                </span>
+            </div>
+        </div>
+
+        <!-- ══ BODY GRID ══ -->
+        <div class="profile-grid">
+
+            <!-- ── ACCOUNT DETAILS ── -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <span class="material-icons card-icon">person</span>
+                    <h2 class="card-title">Account Details</h2>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Full Name</span>
+                    <span class="detail-value">{{ user?.name || '—' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{ user?.email || '—' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{{ user?.phone || '—' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Member Since</span>
+                    <span class="detail-value">{{ user?.created_at | date:'mediumDate' }}</span>
+                </div>
+            </div>
+
+            <!-- ── ORDER SUMMARY ── -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <span class="material-icons card-icon">receipt_long</span>
+                    <h2 class="card-title">Order Summary</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ totalOrders }}</span>
+                        <span class="stat-label">Total Orders</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">Rs. {{ totalSpent }}</span>
+                        <span class="stat-label">Total Spent</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ pendingOrders }}</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ deliveredOrders }}</span>
+                        <span class="stat-label">Delivered</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── CHANGE PASSWORD ── -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <span class="material-icons card-icon">lock</span>
+                    <h2 class="card-title">Change Password</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <div class="input-wrap">
+                        <span class="material-icons input-icon">lock_outline</span>
+                        <input [type]="showCurrent ? 'text' : 'password'" [(ngModel)]="currentPassword"
+                            placeholder="Enter current password" />
+                        <span class="material-icons input-toggle" (click)="showCurrent = !showCurrent">
+                            {{ showCurrent ? 'visibility_off' : 'visibility' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <div class="input-wrap">
+                        <span class="material-icons input-icon">lock_outline</span>
+                        <input [type]="showNew ? 'text' : 'password'" [(ngModel)]="newPassword"
+                            placeholder="Enter new password" />
+                        <span class="material-icons input-toggle" (click)="showNew = !showNew">
+                            {{ showNew ? 'visibility_off' : 'visibility' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <div class="input-wrap">
+                        <span class="material-icons input-icon">lock_outline</span>
+                        <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword"
+                            placeholder="Confirm new password" />
+                        <span class="material-icons input-toggle" (click)="showConfirm = !showConfirm">
+                            {{ showConfirm ? 'visibility_off' : 'visibility' }}
+                        </span>
+                    </div>
+                </div>
+
+                <p class="form-error" *ngIf="passwordError">{{ passwordError }}</p>
+                <p class="form-success" *ngIf="passwordSuccess">{{ passwordSuccess }}</p>
+
+                <button class="btn-action" (click)="onChangePassword()" [disabled]="changingPassword">
+                    <span class="material-icons" style="font-size:17px;">
+                        {{ changingPassword ? 'hourglass_empty' : 'check' }}
+                    </span>
+                    {{ changingPassword ? 'Updating…' : 'Update Password' }}
+                </button>
+            </div>
+
+            <!-- ── DANGER ZONE ── -->
+            <div class="profile-card profile-card--danger">
+                <div class="card-header">
+                    <span class="material-icons card-icon card-icon--danger">warning_amber</span>
+                    <h2 class="card-title card-title--danger">Danger Zone</h2>
+                </div>
+
+                <p class="danger-desc">
+                    Deleting your account is permanent. All your data including order history
+                    will be removed and cannot be recovered.
+                </p>
+
+                <button class="btn-danger" (click)="onDeleteAccount()" *ngIf="!confirmDelete">
+                    <span class="material-icons" style="font-size:17px;">delete_forever</span>
+                    Delete My Account
+                </button>
+
+                <div class="confirm-delete-wrap" *ngIf="confirmDelete">
+                    <p class="confirm-delete-text">Are you absolutely sure?</p>
+                    <div class="confirm-delete-btns">
+                        <button class="btn-danger" (click)="onConfirmDelete()" [disabled]="deleting">
+                            {{ deleting ? 'Deleting…' : 'Yes, Delete' }}
+                        </button>
+                        <button class="btn-cancel" (click)="confirmDelete = false">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /profile-grid -->
+
+    </div>
+    <!-- /profile-container -->
+
+</section>
+
+<app-footer></app-footer>

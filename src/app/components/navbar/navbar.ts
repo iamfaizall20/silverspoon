@@ -62,7 +62,7 @@ export class Navbar implements OnInit {
 
   onMyOrders(): void {
     this.dropdownOpen = false;
-    this.router.navigate(['/orders']);
+    this.router.navigate(['/order/status']);
   }
 
   onLogout(): void {

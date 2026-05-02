@@ -1,0 +1,533 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* ── Page ──────────────────────────────────────────────── */
+.track-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: #2d1f0e;
+    background: #FFFCFB;
+    min-height: 100vh;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #5C3D1E;
+    margin: 0 0 4px;
+    letter-spacing: -0.4px;
+}
+
+.page-sub {
+    font-size: 13px;
+    color: #7A6050;
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+/* ── Back button — matches login page exactly ────────────── */
+.back-btn {
+    border: none;
+    background: rgba(200, 138, 74, 0.12);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #5C3D1E;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    background: #C88A4A;
+    color: #fff;
+    transform: translateX(-1px);
+}
+
+.back-btn .material-icons {
+    font-size: 18px;
+}
+
+/* ── Search card ─────────────────────────────────────────── */
+.search-card {
+    background: #fff;
+    border: 1px solid rgba(200, 138, 74, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(184, 115, 51, 0.06);
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(200, 138, 74, 0.2);
+    border-radius: 50px;
+    overflow: hidden;
+    background: #FFFCFB;
+    transition: border-color 0.2s;
+}
+
+.input-row:focus-within {
+    border-color: #C88A4A;
+}
+
+.input-prefix {
+    padding: 0 14px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #C88A4A;
+    background: rgba(200, 138, 74, 0.08);
+    border-right: 1px solid rgba(200, 138, 74, 0.2);
+    height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+.order-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0 16px;
+    font-size: 13px;
+    height: 48px;
+    color: #2d1f0e;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.order-input::placeholder {
+    color: #C4AD9A;
+    font-size: 13px;
+}
+
+.btn-track {
+    padding: 0 22px;
+    height: 48px;
+    background: #C88A4A;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.btn-track:hover:not(:disabled) {
+    background: #5C3D1E;
+}
+
+.btn-track:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Error ───────────────────────────────────────────────── */
+.error-box {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 10px;
+    padding: 13px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Result card ─────────────────────────────────────────── */
+.result-card {
+    background: #fff;
+    border: 1px solid rgba(200, 138, 74, 0.2);
+    border-radius: 16px;
+    padding: 22px 20px;
+    box-shadow: 0 4px 20px rgba(184, 115, 51, 0.08);
+    animation: fadeUp 0.3s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(200, 138, 74, 0.15);
+}
+
+.result-id {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: #C88A4A;
+}
+
+.result-date {
+    font-size: 12px;
+    color: #9a7a5a;
+    margin-top: 3px;
+}
+
+.result-customer {
+    font-size: 13px;
+    font-weight: 500;
+    color: #5C3D1E;
+    margin-top: 4px;
+}
+
+.result-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.result-total {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #5C3D1E;
+}
+
+/* ── Badges ──────────────────────────────────────────────── */
+.badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 20px;
+    padding: 4px 12px;
+}
+
+.badge-new {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge-pending {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.badge-delivery {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-delivered {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-received {
+    background: #f3e8ff;
+    color: #7e22ce;
+}
+
+/* ── Refresh button ──────────────────────────────────────── */
+.btn-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(200, 138, 74, 0.08);
+    color: #7A6050;
+    border: 1px solid rgba(200, 138, 74, 0.2);
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 18px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.btn-refresh:hover:not(:disabled) {
+    background: rgba(200, 138, 74, 0.18);
+    color: #5C3D1E;
+}
+
+.btn-refresh:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.refresh-icon {
+    font-size: 16px !important;
+}
+
+.refresh-icon.spinning {
+    animation: spin 0.7s linear infinite;
+}
+
+/* ── Status tracker ──────────────────────────────────────── */
+.tracker {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.track-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    gap: 8px;
+}
+
+.step-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 2px solid rgba(200, 138, 74, 0.25);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s;
+}
+
+.track-step.done .step-circle {
+    border-color: #C88A4A;
+    background: #C88A4A;
+}
+
+.track-step.active .step-circle {
+    border-color: #C88A4A;
+    background: #FFFCFB;
+    box-shadow: 0 0 0 4px rgba(200, 138, 74, 0.15);
+}
+
+.step-mat-icon {
+    font-size: 20px !important;
+    color: #fff;
+}
+
+.track-step.active .step-mat-icon {
+    color: #C88A4A;
+}
+
+.step-num {
+    font-size: 13px;
+    font-weight: 600;
+    color: #C4AD9A;
+}
+
+.step-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    color: #9a7a5a;
+    max-width: 68px;
+    line-height: 1.3;
+    letter-spacing: -0.2px;
+}
+
+.track-step.done .step-label,
+.track-step.active .step-label {
+    color: #C88A4A;
+    font-weight: 600;
+}
+
+.step-line {
+    position: absolute;
+    top: 23px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: rgba(200, 138, 74, 0.15);
+    z-index: 0;
+    transition: background 0.3s;
+}
+
+.step-line.filled {
+    background: #C88A4A;
+}
+
+/* ── Banners ─────────────────────────────────────────────── */
+.cancelled-banner,
+.new-banner {
+    border-radius: 10px;
+    padding: 13px 18px;
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cancelled-banner {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.new-banner {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.cancelled-banner .material-icons,
+.new-banner .material-icons {
+    font-size: 18px;
+}
+
+/* ── Section title ───────────────────────────────────────── */
+.section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #C4AD9A;
+    margin: 18px 0 10px;
+}
+
+/* ── Items ───────────────────────────────────────────────── */
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFCFB;
+    border: 1px solid rgba(200, 138, 74, 0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+.item-name {
+    font-weight: 500;
+    flex: 1;
+    color: #5C3D1E;
+}
+
+.item-meta {
+    color: #9a7a5a;
+    font-size: 12px;
+}
+
+.item-qty {
+    color: #9a7a5a;
+    font-size: 12px;
+}
+
+.item-price {
+    font-weight: 600;
+    color: #C88A4A;
+    margin-left: auto;
+}
+
+/* ── Flavours ────────────────────────────────────────────── */
+.flavour-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.flavour-chip {
+    background: rgba(200, 138, 74, 0.1);
+    color: #5C3D1E;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-reset {
+    margin-top: 22px;
+    width: 100%;
+    padding: 12px;
+    background: rgba(200, 138, 74, 0.08);
+    color: #7A6050;
+    border: 1px solid rgba(200, 138, 74, 0.2);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.btn-reset:hover {
+    background: rgba(200, 138, 74, 0.15);
+    color: #5C3D1E;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .step-circle {
+        width: 38px;
+        height: 38px;
+    }
+
+    .step-mat-icon {
+        font-size: 17px !important;
+    }
+
+    .step-label {
+        font-size: 10px;
+        max-width: 54px;
+    }
+
+    .step-line {
+        top: 19px;
+    }
+}

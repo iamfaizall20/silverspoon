@@ -25,7 +25,7 @@
 
 <!-- ── FLAVOURS SECTION ── -->
 <section class="flavours-section" id="flavours-section">
-    <div class=" section-header">
+    <div class="section-header">
         <span class="section-tag">What's Scooping</span>
         <h2 class="section-title">Our Flavours</h2>
         <p class="section-sub">Crafted fresh daily — pick your favourite or try them all.</p>
@@ -33,16 +33,16 @@
 
     <div class="flavours-grid">
         <div class="flavour-card" *ngFor="let f of flavours">
-            
+
             <div class="flavour-swatch" [style.background]="f.color">
                 <span class="swatch-letter">{{ f.name[0] }}</span>
             </div>
-    
+
             <div class="flavour-card-body">
                 <p class="flavour-name">{{ f.name }}</p>
                 <p class="flavour-hex">{{ f.color }}</p>
             </div>
-    
+
         </div>
     </div>
 </section>
@@ -65,20 +65,24 @@
         </button>
     </div>
 
+    <!-- CUPS -->
     <div class="cards-grid" *ngIf="activeTab === 'cups'">
         <div class="product-card" *ngFor="let c of cups">
             <div class="product-icon-wrap" [style.background]="c.lightBg">
                 <span class="material-icons" [style.color]="c.color">{{ c.icon }}</span>
             </div>
             <h3 class="product-name">{{ c.name }}</h3>
-            <p class="product-desc">{{ c.scoops }} · {{ c.desc }}</p>
+            <p class="product-desc">{{ c.scoops }}</p>
             <div class="product-footer">
                 <span class="product-price">Rs. {{ c.price }}</span>
-                <button class="btn-add">+ Add</button>
             </div>
         </div>
+
+        <!-- Empty state -->
+        <p class="empty-state" *ngIf="cups.length === 0">No cups available right now.</p>
     </div>
 
+    <!-- PACKS -->
     <div class="cards-grid" *ngIf="activeTab === 'packs'">
         <div class="product-card product-card--pack" *ngFor="let p of packs">
             <div class="pack-badge">{{ p.badge }}</div>
@@ -86,12 +90,14 @@
                 <span class="material-icons" [style.color]="p.color">{{ p.icon }}</span>
             </div>
             <h3 class="product-name">{{ p.name }}</h3>
-            <p class="product-desc">{{ p.desc }}</p>
+            <p class="product-desc">{{ p.scoops }}</p>
             <div class="product-footer">
                 <span class="product-price">Rs. {{ p.price }}</span>
-                <button class="btn-add">+ Add</button>
             </div>
         </div>
+
+        <!-- Empty state -->
+        <p class="empty-state" *ngIf="packs.length === 0">No packs available right now.</p>
     </div>
 </section>
 

@@ -200,7 +200,8 @@ export class MenuService {
       .from('orders')
       .select(`
         *,
-        order_items ( 
+        order_number,
+        order_items (
           id,
           order_id,
           cup_id,

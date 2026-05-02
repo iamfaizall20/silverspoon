@@ -12,6 +12,8 @@ import { Newsletter } from './components/newsletter/newsletter';
 import { Offers } from './components/offers/offers';
 import { Settings } from './components/settings/settings';
 import { authGuard } from './guards/auth-guard';
+import { Myorders } from './pages/myorders/myorders';
+import { Profile } from './pages/profile/profile';
 
 export const routes: Routes = [
 
@@ -21,6 +23,8 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
     { path: 'order/new', component: Order },
+    { path: 'order/status', component: Myorders },
+    { path: 'profile', component: Profile },
 
     // Admin Pages
     {
