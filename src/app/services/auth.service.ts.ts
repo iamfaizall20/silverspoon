@@ -58,6 +58,26 @@ export class AuthService {
   }
 
   /**
+   * Step 1: Send reset link to email.
+   * Supabase emails a link like: yourapp.com/reset-password#access_token=...
+   */
+  async sendPasswordResetEmail(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'http://localhost:4200/login/reset', // 🔁 change to your prod URL
+    });
+    if (error) throw error;
+  }
+
+  /**
+   * Step 2: Called after user clicks the email link and lands back on /reset-password.
+   * Supabase auto-restores the session from the URL hash — just call updateUser.
+   */
+  async updatePassword(newPassword: string) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  }
+
+  /**
    * Fetches name + role from profiles table.
    */
   async getUserProfile(uid: string): Promise<UserProfile | null> {

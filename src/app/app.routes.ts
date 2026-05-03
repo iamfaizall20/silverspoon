@@ -15,6 +15,7 @@ import { authGuard } from './guards/auth-guard'; // ← new
 import { Myorders } from './pages/myorders/myorders';
 import { Profile } from './pages/profile/profile';
 import { adminGuard } from './guards/admin-guard-guard';
+import { ResetPassword } from './reset-password/reset-password';
 
 export const routes: Routes = [
 
@@ -22,6 +23,7 @@ export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: 'home', component: Landingpage },
     { path: 'login', component: Login },
+    { path: 'login/reset', component: ResetPassword },
     { path: 'signup', component: Signup },
     { path: 'order/new', component: Order, canActivate: [authGuard] },
     { path: 'order/status', component: Myorders, canActivate: [authGuard] },
