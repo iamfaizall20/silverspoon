@@ -16,6 +16,7 @@ import { Myorders } from './pages/myorders/myorders';
 import { Profile } from './pages/profile/profile';
 import { adminGuard } from './guards/admin-guard-guard';
 import { ResetPassword } from './reset-password/reset-password';
+import { confirmEmail } from './confirm-email/confirm-email';
 
 export const routes: Routes = [
 
@@ -25,7 +26,8 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'login/reset', component: ResetPassword },
     { path: 'signup', component: Signup },
-    { path: 'order/new', component: Order, canActivate: [authGuard] },
+    { path: 'signup/confirm-email', component: confirmEmail },
+    { path: 'order/new', component: Order, },
     { path: 'order/status', component: Myorders, canActivate: [authGuard] },
     { path: 'profile', component: Profile, canActivate: [authGuard] },
 

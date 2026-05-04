@@ -49,22 +49,25 @@ export class Signup {
 
   async onSignup() {
     if (!this.formValid || this.isLoading) return;
-
     this.isLoading = true;
 
     try {
-      const user = await this.authservice.signUp(
+      await this.authservice.signUp(
         this.email.trim(),
         this.password,
         this.fullName.trim()
       );
 
-      alert("Signup successful 🎉");
-      this.router.navigate(['/login']);
+      // Navigate to confirmation pending page, pass email as state
+      this.router.navigate(['/signup/confirm-email'], {
+        state: { email: this.email.trim() }
+      });
 
     } catch (err: any) {
-      if (err.message.includes('rate limit')) {
-        alert("Too many attempts. Please wait a moment ⏳");
+      if (err.message?.includes('User already registered')) {
+        alert('An account with this email already exists. Please sign in.');
+      } else if (err.message?.includes('rate limit')) {
+        alert('Too many attempts. Please wait a moment ⏳');
       } else {
         alert(err.message);
       }

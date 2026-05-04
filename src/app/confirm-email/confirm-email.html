@@ -1,0 +1,70 @@
+<div class="confirm-page">
+    <div class="form-wrap">
+
+        <!-- Header -->
+        <div class="form-header">
+            <button class="back-btn" onclick="history.back()">
+                <span class="material-icons">arrow_back</span>
+            </button>
+            <h1>Check your inbox</h1>
+            <p>Almost there — just one more step</p>
+        </div>
+
+        <!-- Email icon -->
+        <div class="email-icon-wrap">
+            <div class="email-icon-ring">
+                <span class="material-icons email-icon">mark_email_unread</span>
+            </div>
+            <div class="ping-ring"></div>
+        </div>
+
+        <!-- Info -->
+        <div class="confirm-body">
+            <p class="confirm-desc">
+                We sent a confirmation link to
+            </p>
+            <div class="email-badge">
+                <span class="material-icons badge-icon">alternate_email</span>
+                <span class="email-text">{{ email }}</span>
+            </div>
+            <p class="confirm-sub">
+                Click the link in your email to verify your account. Once confirmed, you can sign in.
+            </p>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider">
+            <span></span>
+            <p>actions</p>
+            <span></span>
+        </div>
+
+        <!-- Resend success banner -->
+        <div class="success-banner" *ngIf="resendSuccess">
+            <span class="material-icons success-icon">check_circle</span>
+            Email resent! Check your inbox (or spam folder).
+        </div>
+
+        <!-- Resend button -->
+        <button class="btn-resend" (click)="onResend()" [disabled]="resendCooldown > 0 || isResending">
+            <span class="material-icons btn-icon" *ngIf="!isResending">send</span>
+            <span class="material-icons btn-icon spinning" *ngIf="isResending">autorenew</span>
+            <span *ngIf="!isResending && resendCooldown === 0">Resend confirmation email</span>
+            <span *ngIf="isResending">Sending...</span>
+            <span *ngIf="!isResending && resendCooldown > 0">Resend in {{ resendCooldown }}s</span>
+        </button>
+
+        <!-- Go to login -->
+        <a routerLink="/login" class="btn-login">
+            <span class="material-icons btn-icon">login</span>
+            Go to Sign in
+        </a>
+
+        <!-- Spam note -->
+        <p class="spam-note">
+            <span class="material-icons spam-icon">info</span>
+            Can't find it? Check your <strong>spam</strong> or <strong>junk</strong> folder.
+        </p>
+
+    </div>
+</div>

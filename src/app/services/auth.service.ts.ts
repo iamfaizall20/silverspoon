@@ -44,10 +44,25 @@ export class AuthService {
 
     return data;
   }
+  async resendConfirmationEmail(email: string) {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+    });
+    if (error) throw error;
+  }
 
   async login(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
     if (error) throw error;
+
+    // Block unconfirmed users from logging in
+    if (!data.user?.email_confirmed_at) {
+      await supabase.auth.signOut();
+      throw new Error('Please confirm your email before logging in. Check your inbox.');
+    }
+
     return data;
   }
 
