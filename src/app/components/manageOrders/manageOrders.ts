@@ -77,6 +77,12 @@ export class Orders implements OnInit {
 
   openMenuId: number | null = null;
 
+  /**
+   * Holds the computed `top` / `right` for the fixed-position action dropdown.
+   * Calculated from the trigger button's bounding rect in toggleMenu().
+   */
+  menuStyle: Record<string, string> = {};
+
   // ── Toast ─────────────────────────────────────────────────────────────────────
   toastVisible = false;
   toastMsg = '';
@@ -110,20 +116,38 @@ export class Orders implements OnInit {
     await this.loadOrders();
   }
 
-  // ─── Close menu on outside click ──────────────────────────────────────────────
+  // ─── Close menu on outside click / scroll ─────────────────────────────────────
 
   @HostListener('document:click')
   onDocumentClick(): void {
     this.openMenuId = null;
   }
 
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    // Close the menu if the user scrolls so the fixed coords don't drift
+    if (this.openMenuId !== null) {
+      this.openMenuId = null;
+    }
+  }
+
   // ─── Data Loading ─────────────────────────────────────────────────────────────
 
   async loadOrders(): Promise<void> {
+    if (this.isLoading) return;
     this.isLoading = true;
     try {
       const data = await this.menuService.getOrders();
-      this.orders = (data as OrderRecord[]) ?? [];
+
+      // Map order_items → order_cups so the drawer template can reference item.cups
+      this.orders = ((data as any[]) ?? []).map((o: any) => ({
+        ...o,
+        order_cups: (o.order_items ?? []).map((oi: any) => ({
+          ...oi,
+          cups: oi.items ?? null,
+        })),
+      })) as OrderRecord[];
+
     } catch (error) {
       console.error('Error loading orders:', error);
       this.showToast('Failed to load orders');
@@ -230,9 +254,37 @@ export class Orders implements OnInit {
 
   // ─── Menu ─────────────────────────────────────────────────────────────────────
 
+  /**
+   * Toggle the ⋮ action menu.
+   * We use `position: fixed` for the dropdown so it is never clipped by the
+   * table's overflow. The position is calculated from the trigger button's
+   * viewport rect and stored in `menuStyle` which is bound via [ngStyle].
+   */
   toggleMenu(orderId: number, event?: Event): void {
     event?.stopPropagation();
-    this.openMenuId = this.openMenuId === orderId ? null : orderId;
+
+    if (this.openMenuId === orderId) {
+      this.openMenuId = null;
+      return;
+    }
+
+    // Compute position from the button element
+    const btn = (event?.currentTarget ?? event?.target) as HTMLElement | null;
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      const menuWidth = 160; // matches CSS min-width
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUpward = spaceBelow < 120; // flip if tight
+
+      this.menuStyle = {
+        top: openUpward ? `${rect.top - 4}px` : `${rect.bottom + 6}px`,
+        right: `${window.innerWidth - rect.right}px`,
+        transform: openUpward ? 'translateY(-100%)' : 'none',
+        minWidth: `${menuWidth}px`,
+      };
+    }
+
+    this.openMenuId = orderId;
   }
 
   // ─── Order Actions ────────────────────────────────────────────────────────────
@@ -256,7 +308,7 @@ export class Orders implements OnInit {
   }
 
   async updateOrderStatus(orderId: number, status: OrderStatus): Promise<void> {
-    // Optimistic update — update UI immediately
+    // Optimistic update
     this.orders = this.orders.map(o => o.id === orderId ? { ...o, status } : o);
     if (this.selectedOrder?.id === orderId) {
       this.selectedOrder = { ...this.selectedOrder, status };

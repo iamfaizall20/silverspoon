@@ -187,6 +187,58 @@
   box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.12);
 }
 
+/* Refresh Button */
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--gold-border);
+  background: var(--white);
+  color: var(--brown-mid);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition),
+    color var(--transition), transform var(--transition);
+  white-space: nowrap;
+  align-self: flex-end;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #f7efe6;
+  border-color: var(--gold);
+  color: var(--gold-dark);
+  transform: translateY(-1px);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refresh-btn .material-icons {
+  font-size: 17px;
+  transition: transform 0.5s ease;
+}
+
+.refresh-btn.spinning .material-icons {
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ══════════════════════════════════════
    TABLE SHELL
 ══════════════════════════════════════ */
@@ -195,19 +247,23 @@
   border: 1px solid var(--border);
   background: var(--white);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
+  /* IMPORTANT: do NOT set overflow:hidden here — it clips the action-menu dropdown */
+  overflow: visible;
 }
 
 .orders-table-scroll {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  border-radius: 20px;
+  /* keep visual rounding on the scroll wrapper */
+  overflow-y: visible;
+  /* let dropdowns escape vertically */
 }
 
 .orders-table {
   width: 100%;
   min-width: 640px;
-  /* prevents collapse below usable width */
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -246,14 +302,23 @@
   white-space: nowrap;
 }
 
+/* Round top corners of thead */
+.orders-table thead th:first-child {
+  border-top-left-radius: 20px;
+}
+
+.orders-table thead th:last-child {
+  border-top-right-radius: 20px;
+}
+
 .orders-table tbody td {
   padding: 14px 16px;
   border-bottom: 1px solid var(--border-slim);
   vertical-align: middle;
   font-size: 13px;
   color: #2d2620;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* overflow visible so action menus are never clipped */
+  overflow: visible;
 }
 
 .orders-table tbody tr:last-child td {
@@ -349,7 +414,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  position: relative;
+  /* do NOT set position:relative here — we use fixed positioning for the menu */
 }
 
 .accept-btn {
@@ -394,9 +459,12 @@
 
 /* ══════════════════════════════════════
    MENU BUTTON & DROPDOWN
+   Uses fixed positioning so the dropdown
+   is never clipped by table overflow.
 ══════════════════════════════════════ */
 .menu-wrapper {
   position: relative;
+  /* anchor for JS-computed fixed offset */
   flex-shrink: 0;
 }
 
@@ -425,16 +493,16 @@
   font-size: 18px;
 }
 
+/* The dropdown is teleported to body via fixed positioning */
 .action-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 999;
+  position: fixed;
+  /* KEY FIX: escape table stacking context */
+  z-index: 9999;
   min-width: 160px;
   background: var(--white);
   border: 1px solid rgba(30, 25, 20, 0.12);
   border-radius: 14px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
   overflow: hidden;
   animation: menuPop 0.15s ease;
 }
@@ -590,7 +658,7 @@
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.45);
   z-index: 1000;
   cursor: default;
   border: none;
@@ -598,6 +666,7 @@
 
 /* ══════════════════════════════════════
    ORDER SUMMARY DRAWER
+   Solid background — no transparency
 ══════════════════════════════════════ */
 .order-summary-drawer {
   position: fixed;
@@ -606,14 +675,22 @@
   height: 100vh;
   width: 440px;
   max-width: 100vw;
-  background: var(--white);
+
+  /* SOLID white — no alpha, no inherit */
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+
   z-index: 1001;
   transform: translateX(110%);
   transition: transform 0.28s ease;
   display: flex;
   flex-direction: column;
-  box-shadow: -12px 0 36px rgba(0, 0, 0, 0.12);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.16);
   overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Isolation ensures nothing bleeds through */
+  isolation: isolate;
 }
 
 .order-summary-drawer.open {
@@ -629,8 +706,10 @@
   gap: 12px;
   position: sticky;
   top: 0;
-  background: var(--white);
-  z-index: 1;
+  /* Also solid on sticky header */
+  background-color: #ffffff;
+  background: #ffffff;
+  z-index: 2;
 }
 
 .drawer-eyebrow {
@@ -672,6 +751,7 @@
 .drawer-body {
   padding: 20px;
   flex: 1;
+  background-color: #ffffff;
 }
 
 .drawer-section {
@@ -945,6 +1025,11 @@
     width: 100%;
   }
 
+  .refresh-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   /* Hide customer contact sub-line on mobile */
   .customer-cell span {
     display: none;
@@ -985,8 +1070,6 @@
   .header-description {
     display: none;
   }
-
-  /* reclaim space */
 
   .orders-toolbar {
     padding: 10px 12px;

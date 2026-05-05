@@ -13,7 +13,6 @@ import { AuthService } from '../../services/auth.service.ts';
 export class Sidebar implements OnInit {
 
   activeLink: string = 'dashboard';
-  pendingOrders: number = 5;
   isOpen: boolean = false;
 
   constructor(private router: Router, private authService: AuthService) { }

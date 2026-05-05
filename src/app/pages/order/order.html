@@ -84,48 +84,75 @@
                     <p class="section-hint">Choose cup sizes and enter quantity for each</p>
 
                     <div class="cup-rows">
-                        <div class="cup-row" *ngFor="let cup of cupSizes">
-                            <div class="cup-row-info">
-                                <span class="cup-name">{{ cup.name }}</span>
-                                <span class="cup-meta">{{ cup.scoops }} · Rs.{{ cup.price }}/-</span>
+                        <div class="cup-item" *ngFor="let cup of cupSizes">
+
+                            <!-- Row: name + qty controls -->
+                            <div class="cup-row">
+                                <div class="cup-row-info">
+                                    <div class="cup-name-row">
+                                        <span class="cup-name">{{ cup.name }}</span>
+                                        <span class="cup-category-badge" [class.pack]="cup.category === 'pack'">
+                                            {{ cup.category === 'pack' ? 'Pack' : 'Cup' }}
+                                        </span>
+                                    </div>
+                                    <span class="cup-meta">{{ cup.scoops }} · Rs.{{ cup.price }}/-</span>
+                                </div>
+                                <div class="cup-qty-controls">
+                                    <button class="qty-btn" (click)="decrementCup(cup)"
+                                        [disabled]="getCupQty(cup.id) === 0">
+                                        <span class="material-icons">remove</span>
+                                    </button>
+                                    <span class="qty-val">{{ getCupQty(cup.id) }}</span>
+                                    <button class="qty-btn" (click)="incrementCup(cup)">
+                                        <span class="material-icons">add</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="cup-qty-controls">
-                                <button class="qty-btn" (click)="decrementCup(cup)"
-                                    [disabled]="getCupQty(cup.id) === 0">
-                                    <span class="material-icons">remove</span>
-                                </button>
-                                <span class="qty-val">{{ getCupQty(cup.id) }}</span>
-                                <button class="qty-btn" (click)="incrementCup(cup)">
-                                    <span class="material-icons">add</span>
-                                </button>
+
+                            <!-- Inline flavour picker — only shown when qty > 0 -->
+                            <div class="item-flavour-picker" *ngIf="getCupQty(cup.id) > 0">
+                                <div class="item-flavour-header">
+                                    <span class="material-icons flavour-icon">palette</span>
+                                    <span class="item-flavour-label">
+                                        Flavours for <strong>{{ cup.name }}</strong>
+                                        <em class="flavour-hint">(up to 2)</em>
+                                    </span>
+                                    <!-- Selected chips -->
+                                    <div class="item-selected-chips" *ngIf="getItemFlavours(cup.id).length > 0">
+                                        <span class="selected-chip" *ngFor="let fId of getItemFlavours(cup.id)"
+                                            (click)="toggleItemFlavour(cup.id, fId)">
+                                            <span class="chip-dot"
+                                                [style.background]="getFlavourById(fId)?.color"></span>
+                                            {{ getFlavourById(fId)?.name }}
+                                            <span class="material-icons remove-icon">close</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="flavours-grid">
+                                    <div class="flavour-chip" *ngFor="let f of flavours"
+                                        [class.selected]="isItemFlavourSelected(cup.id, f.id)"
+                                        [class.disabled]="getItemFlavours(cup.id).length >= 2 && !isItemFlavourSelected(cup.id, f.id)"
+                                        (click)="toggleItemFlavour(cup.id, f.id)">
+                                        <span class="dot" [style.background]="f.color"></span>
+                                        {{ f.name }}
+                                    </div>
+                                </div>
+
+                                <!-- Validation nudge -->
+                                <p class="flavour-required-note" *ngIf="getItemFlavours(cup.id).length === 0">
+                                    <span class="material-icons"
+                                        style="font-size:13px;vertical-align:middle">info</span>
+                                    Please select at least 1 flavour for this item
+                                </p>
                             </div>
+
                         </div>
                     </div>
 
                     <div class="cups-summary" *ngIf="totalCupsCount > 0">
                         <span class="material-icons" style="font-size:15px">shopping_cart</span>
                         {{ totalCupsCount }} cup{{ totalCupsCount !== 1 ? 's' : '' }} selected
-                    </div>
-                </div>
-
-                <!-- Flavour Selection -->
-                <div class="flavours-selector">
-                    <label class="section-label">Choose Flavours *</label>
-                    <p class="section-hint">Select up to 2 flavours</p>
-
-                    <div class="selected-flavours-row" *ngIf="order.flavours.length > 0">
-                        <span class="selected-chip" *ngFor="let id of order.flavours" (click)="toggleFlavour(id)">
-                            {{ getFlavourById(id)?.name }}
-                            <span class="material-icons remove-icon">close</span>
-                        </span>
-                    </div>
-
-                    <div class="flavours-grid">
-                        <div class="flavour-chip" *ngFor="let f of flavours" [class.selected]="isFlavourSelected(f.id)"
-                            (click)="toggleFlavour(f.id)">
-                            <span class="dot" [style.background]="f.color"></span>
-                            {{ f.name }}
-                        </div>
                     </div>
                 </div>
 
@@ -187,11 +214,9 @@
 
             <!-- THERMAL RECEIPT -->
             <div class="receipt">
-                <!-- Top serrated edge -->
                 <div class="receipt-edge receipt-edge--top"></div>
 
                 <div class="receipt-inner">
-                    <!-- Shop header -->
                     <div class="receipt-shop-header">
                         <p class="receipt-shop-name">🍦 Silver Spoon</p>
                         <p class="receipt-shop-sub">ICE CREAM PARLOUR</p>
@@ -208,7 +233,6 @@
                         <div class="receipt-divider">================================</div>
                     </div>
 
-                    <!-- Customer info -->
                     <div class="receipt-customer">
                         <div class="receipt-kv"><span>CUST:</span><span>{{ order.name | uppercase }}</span></div>
                         <div class="receipt-kv"><span>TEL:</span><span>{{ order.phone }}</span></div>
@@ -217,31 +241,28 @@
                     </div>
                     <div class="receipt-divider">--------------------------------</div>
 
-                    <!-- Items -->
                     <div class="receipt-items-header">
                         <span>ITEM</span><span>QTY</span><span>PRICE</span>
                     </div>
                     <div class="receipt-divider">- - - - - - - - - - - - - - - -</div>
 
+                    <!-- Each selected item with its own flavours -->
                     <ng-container *ngFor="let cup of cupSizes">
-                        <div class="receipt-item" *ngIf="getCupQty(cup.id) > 0">
-                            <span class="receipt-item-name">{{ cup.name | uppercase }}</span>
-                            <span>x{{ getCupQty(cup.id) }}</span>
-                            <span>Rs.{{ cup.price * getCupQty(cup.id) }}</span>
-                        </div>
+                        <ng-container *ngIf="getCupQty(cup.id) > 0">
+                            <div class="receipt-item">
+                                <span class="receipt-item-name">{{ cup.name | uppercase }}</span>
+                                <span>x{{ getCupQty(cup.id) }}</span>
+                                <span>Rs.{{ cup.price * getCupQty(cup.id) }}</span>
+                            </div>
+                            <div class="receipt-item-flavours">
+                                <span class="receipt-flavour-label">↳ FLAVOUR:</span>
+                                <span>{{ getItemFlavourNames(cup.id) | uppercase }}</span>
+                            </div>
+                        </ng-container>
                     </ng-container>
-
-                    <div class="receipt-divider">- - - - - - - - - - - - - - - -</div>
-
-                    <!-- Flavours -->
-                    <div class="receipt-flavours">
-                        <span>FLAVOUR(S):</span>
-                        <span>{{ selectedFlavourNames | uppercase }}</span>
-                    </div>
 
                     <div class="receipt-divider">================================</div>
 
-                    <!-- Totals -->
                     <div class="receipt-total-rows">
                         <div class="receipt-kv">
                             <span>SUBTOTAL</span><span>Rs. {{ subtotal }}/-</span>
@@ -260,7 +281,6 @@
 
                     <div class="receipt-divider">================================</div>
 
-                    <!-- Footer -->
                     <div class="receipt-footer">
                         <p>** THANK YOU FOR YOUR ORDER! **</p>
                         <p>Delivered within 30-45 minutes</p>
@@ -276,7 +296,6 @@
                     </div>
                 </div>
 
-                <!-- Bottom serrated edge -->
                 <div class="receipt-edge receipt-edge--bottom"></div>
             </div>
         </div>

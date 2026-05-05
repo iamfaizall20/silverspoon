@@ -8,7 +8,6 @@ export class MenuService {
 
   // ─────────────────────────────────────
   // CUPS  (DB columns: id, name, scoops, price, is_active, category)
-  // category values: 'cup' | 'pack'
   // ─────────────────────────────────────
 
   async getCups() {
@@ -173,27 +172,41 @@ export class MenuService {
     return data;
   }
 
-  async insertOrderCups(orderCups: any[]) {
-    const { error } = await supabase
+  /**
+   * Inserts order_items and returns the inserted rows (including generated IDs).
+   * The returned rows are used to link per-item flavours in order_item_flavours.
+   */
+  async insertOrderCups(orderCups: any[]): Promise<any[]> {
+    const { data, error } = await supabase
       .from('order_items')
-      .insert(orderCups);
+      .insert(orderCups)
+      .select();          // ← returns inserted rows with their IDs
 
     if (error) {
       console.error('Error inserting order cups:', error);
       throw error;
     }
+    return data ?? [];
   }
 
-  async insertOrderFlavours(orderFlavours: any[]) {
+  /**
+   * NEW: Inserts per-item flavour rows into order_item_flavours.
+   * Each row links one order_item to one flavour.
+   */
+  async insertOrderItemFlavours(rows: { order_item_id: number; flavour_id: string | number }[]) {
     const { error } = await supabase
-      .from('order_flavours')
-      .insert(orderFlavours);
+      .from('order_item_flavours')
+      .insert(rows);
 
     if (error) {
-      console.error('Error inserting order flavours:', error);
+      console.error('Error inserting order item flavours:', error);
       throw error;
     }
   }
+
+  // ─────────────────────────────────────
+  // ORDERS — READ / STATUS
+  // ─────────────────────────────────────
 
   async getOrders() {
     const { data, error } = await supabase
@@ -207,13 +220,12 @@ export class MenuService {
           cup_id,
           quantity,
           price_at_time,
-          items ( id, name, scoops, price, is_active, category )
-        ),
-        order_flavours (
-          id,
-          order_id,
-          flavour_id,
-          flavours(id,name)
+          items ( id, name, scoops, price, is_active, category ),
+          order_item_flavours (
+            id,
+            flavour_id,
+            flavours ( id, name, color )
+          )
         )
       `)
       .order('order_date', { ascending: false });
@@ -259,27 +271,10 @@ export class MenuService {
     weekStart.setDate(weekStart.getDate() - 6);
 
     const [todayOrdersRes, yesterdayOrdersRes, totalCustomersRes, weekOrdersRes] = await Promise.all([
-      supabase
-        .from('orders')
-        .select('id, total, customer_name')
-        .gte('order_date', todayStart.toISOString())
-        .lte('order_date', todayEnd.toISOString()),
-
-      supabase
-        .from('orders')
-        .select('id, total')
-        .gte('order_date', yesterdayStart.toISOString())
-        .lte('order_date', yesterdayEnd.toISOString()),
-
-      supabase
-        .from('orders')
-        .select('customer_name', { count: 'exact', head: false }),
-
-      supabase
-        .from('orders')
-        .select('id, total')
-        .gte('order_date', weekStart.toISOString())
-        .lte('order_date', todayEnd.toISOString()),
+      supabase.from('orders').select('id, total, customer_name').gte('order_date', todayStart.toISOString()).lte('order_date', todayEnd.toISOString()),
+      supabase.from('orders').select('id, total').gte('order_date', yesterdayStart.toISOString()).lte('order_date', yesterdayEnd.toISOString()),
+      supabase.from('orders').select('customer_name', { count: 'exact', head: false }),
+      supabase.from('orders').select('id, total').gte('order_date', weekStart.toISOString()).lte('order_date', todayEnd.toISOString()),
     ]);
 
     if (todayOrdersRes.error) throw todayOrdersRes.error;
@@ -290,136 +285,74 @@ export class MenuService {
     const todayOrders = todayOrdersRes.data ?? [];
     const yesterdayOrders = yesterdayOrdersRes.data ?? [];
 
-    const todayRevenue = todayOrders.reduce((sum: number, o: any) => sum + (o.total ?? 0), 0);
-    const yesterdayRevenue = yesterdayOrders.reduce((sum: number, o: any) => sum + (o.total ?? 0), 0);
-
+    const todayRevenue = todayOrders.reduce((s: number, o: any) => s + (o.total ?? 0), 0);
+    const yesterdayRevenue = yesterdayOrders.reduce((s: number, o: any) => s + (o.total ?? 0), 0);
     const todayOrderCount = todayOrders.length;
     const yesterdayOrderCount = yesterdayOrders.length;
 
-    const uniqueCustomers = new Set(
-      (totalCustomersRes.data ?? []).map((o: any) => o.customer_name)
-    ).size;
+    const uniqueCustomers = new Set((totalCustomersRes.data ?? []).map((o: any) => o.customer_name)).size;
 
     const weekOrders = weekOrdersRes.data ?? [];
-    const weekRevenue = weekOrders.reduce((sum: number, o: any) => sum + (o.total ?? 0), 0);
+    const weekRevenue = weekOrders.reduce((s: number, o: any) => s + (o.total ?? 0), 0);
     const avgOrderValue = weekOrders.length > 0 ? Math.round(weekRevenue / weekOrders.length) : 0;
 
-    const lastWeekStart = new Date(weekStart);
-    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-    const lastWeekEnd = new Date(todayStart);
-    lastWeekEnd.setDate(lastWeekEnd.getDate() - 7);
+    const lastWeekStart = new Date(weekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+    const lastWeekEnd = new Date(todayStart); lastWeekEnd.setDate(lastWeekEnd.getDate() - 7);
 
-    const lastWeekOrdersRes = await supabase
-      .from('orders')
-      .select('id, total')
-      .gte('order_date', lastWeekStart.toISOString())
-      .lte('order_date', lastWeekEnd.toISOString());
+    const lastWeekOrdersRes = await supabase.from('orders').select('id, total').gte('order_date', lastWeekStart.toISOString()).lte('order_date', lastWeekEnd.toISOString());
 
     const lastWeekOrders = lastWeekOrdersRes.data ?? [];
-    const lastWeekRevenue = lastWeekOrders.reduce((sum: number, o: any) => sum + (o.total ?? 0), 0);
+    const lastWeekRevenue = lastWeekOrders.reduce((s: number, o: any) => s + (o.total ?? 0), 0);
     const lastWeekAvg = lastWeekOrders.length > 0 ? Math.round(lastWeekRevenue / lastWeekOrders.length) : 0;
 
-    const revenueChange = yesterdayRevenue > 0
-      ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100)
-      : 0;
+    const revenueChange = yesterdayRevenue > 0 ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100) : 0;
     const ordersChange = todayOrderCount - yesterdayOrderCount;
-    const avgChange = lastWeekAvg > 0
-      ? Math.round(((avgOrderValue - lastWeekAvg) / lastWeekAvg) * 100)
-      : 0;
+    const avgChange = lastWeekAvg > 0 ? Math.round(((avgOrderValue - lastWeekAvg) / lastWeekAvg) * 100) : 0;
 
-    return {
-      todayRevenue,
-      todayOrderCount,
-      uniqueCustomers,
-      avgOrderValue,
-      revenueChange,
-      ordersChange,
-      avgChange,
-    };
+    return { todayRevenue, todayOrderCount, uniqueCustomers, avgOrderValue, revenueChange, ordersChange, avgChange };
   }
 
   async getWeeklyRevenue() {
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
+    const today = new Date(); today.setHours(23, 59, 59, 999);
 
     const days: { label: string; start: Date; end: Date }[] = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const start = new Date(d);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(d);
-      end.setHours(23, 59, 59, 999);
-      days.push({
-        label: d.toLocaleDateString('en-PK', { weekday: 'short' }),
-        start,
-        end,
-      });
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const start = new Date(d); start.setHours(0, 0, 0, 0);
+      const end = new Date(d); end.setHours(23, 59, 59, 999);
+      days.push({ label: d.toLocaleDateString('en-PK', { weekday: 'short' }), start, end });
     }
 
     const lastWeekDays = days.map(d => {
-      const start = new Date(d.start);
-      start.setDate(start.getDate() - 7);
-      const end = new Date(d.end);
-      end.setDate(end.getDate() - 7);
+      const start = new Date(d.start); start.setDate(start.getDate() - 7);
+      const end = new Date(d.end); end.setDate(end.getDate() - 7);
       return { start, end };
     });
 
-    const rangeStart = days[0].start;
-    const rangeEnd = days[6].end;
-    const lastRangeStart = lastWeekDays[0].start;
-    const lastRangeEnd = lastWeekDays[6].end;
-
     const [thisWeekRes, lastWeekRes] = await Promise.all([
-      supabase
-        .from('orders')
-        .select('order_date, total')
-        .gte('order_date', rangeStart.toISOString())
-        .lte('order_date', rangeEnd.toISOString()),
-
-      supabase
-        .from('orders')
-        .select('order_date, total')
-        .gte('order_date', lastRangeStart.toISOString())
-        .lte('order_date', lastRangeEnd.toISOString()),
+      supabase.from('orders').select('order_date, total').gte('order_date', days[0].start.toISOString()).lte('order_date', days[6].end.toISOString()),
+      supabase.from('orders').select('order_date, total').gte('order_date', lastWeekDays[0].start.toISOString()).lte('order_date', lastWeekDays[6].end.toISOString()),
     ]);
 
     if (thisWeekRes.error) throw thisWeekRes.error;
     if (lastWeekRes.error) throw lastWeekRes.error;
 
-    const sumByDay = (orders: any[], dayBuckets: { start: Date; end: Date }[]) =>
-      dayBuckets.map(bucket =>
-        orders
-          .filter((o: any) => {
-            const d = new Date(o.order_date);
-            return d >= bucket.start && d <= bucket.end;
-          })
-          .reduce((sum: number, o: any) => sum + (o.total ?? 0), 0)
-      );
+    const sumByDay = (orders: any[], buckets: { start: Date; end: Date }[]) =>
+      buckets.map(b => orders.filter((o: any) => { const d = new Date(o.order_date); return d >= b.start && d <= b.end; }).reduce((s: number, o: any) => s + (o.total ?? 0), 0));
 
     const thisWeekTotals = sumByDay(thisWeekRes.data ?? [], days.map(d => ({ start: d.start, end: d.end })));
     const lastWeekTotals = sumByDay(lastWeekRes.data ?? [], lastWeekDays);
 
-    return days.map((d, i) => ({
-      day: d.label,
-      thisWeek: thisWeekTotals[i],
-      lastWeek: lastWeekTotals[i],
-    }));
+    return days.map((d, i) => ({ day: d.label, thisWeek: thisWeekTotals[i], lastWeek: lastWeekTotals[i] }));
   }
 
   async getTodayCupStats() {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
 
     const { data, error } = await supabase
       .from('order_items')
-      .select(`
-        quantity,
-        items ( id, name ),
-        orders!inner ( order_date )
-      `)
+      .select(`quantity, items ( id, name ), orders!inner ( order_date )`)
       .gte('orders.order_date', todayStart.toISOString())
       .lte('orders.order_date', todayEnd.toISOString());
 
@@ -427,77 +360,57 @@ export class MenuService {
 
     const countMap: Record<string, { name: string; count: number }> = {};
     for (const row of data ?? []) {
-      const id = (row.items as any)?.id;
-      const name = (row.items as any)?.name ?? 'Unknown';
-      if (!id) continue;
-      if (!countMap[id]) countMap[id] = { name, count: 0 };
+      const id = (row.items as any)?.id; if (!id) continue;
+      if (!countMap[id]) countMap[id] = { name: (row.items as any)?.name ?? 'Unknown', count: 0 };
       countMap[id].count += row.quantity ?? 1;
     }
 
     const total = Object.values(countMap).reduce((s, v) => s + v.count, 0);
     const palette = ['#B87333', '#D4956A', '#E8C4A0', '#F2DDD0', '#9A9088', '#7A4E22'];
 
-    return Object.values(countMap)
-      .sort((a, b) => b.count - a.count)
-      .map((v, i) => ({
-        label: v.name,
-        count: v.count,
-        percent: total > 0 ? Math.round((v.count / total) * 100) : 0,
-        color: palette[i % palette.length],
-      }));
+    return Object.values(countMap).sort((a, b) => b.count - a.count).map((v, i) => ({
+      label: v.name, count: v.count,
+      percent: total > 0 ? Math.round((v.count / total) * 100) : 0,
+      color: palette[i % palette.length],
+    }));
   }
 
   async getTopFlavours() {
-    const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - 6);
-    weekStart.setHours(0, 0, 0, 0);
+    const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 6); weekStart.setHours(0, 0, 0, 0);
 
+    // Now queries order_item_flavours instead of order_flavours
     const { data, error } = await supabase
-      .from('order_flavours')
+      .from('order_item_flavours')
       .select(`
         flavour_id,
         flavours ( id, name, color ),
-        orders!inner ( order_date )
+        order_items!inner (
+          orders!inner ( order_date )
+        )
       `)
-      .gte('orders.order_date', weekStart.toISOString());
+      .gte('order_items.orders.order_date', weekStart.toISOString());
 
     if (error) throw error;
 
     const countMap: Record<string, { name: string; color: string; count: number }> = {};
     for (const row of data ?? []) {
-      const id = (row.flavours as any)?.id;
-      if (!id) continue;
-      if (!countMap[id]) {
-        countMap[id] = {
-          name: (row.flavours as any)?.name ?? 'Unknown',
-          color: (row.flavours as any)?.color ?? '#B87333',
-          count: 0,
-        };
-      }
+      const id = (row.flavours as any)?.id; if (!id) continue;
+      if (!countMap[id]) countMap[id] = { name: (row.flavours as any)?.name ?? 'Unknown', color: (row.flavours as any)?.color ?? '#B87333', count: 0 };
       countMap[id].count++;
     }
 
     const maxCount = Math.max(...Object.values(countMap).map(v => v.count), 1);
 
-    return Object.values(countMap)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 6)
-      .map(v => ({
-        name: v.name,
-        color: v.color,
-        percent: Math.round((v.count / maxCount) * 100),
-      }));
+    return Object.values(countMap).sort((a, b) => b.count - a.count).slice(0, 6).map(v => ({
+      name: v.name, color: v.color, percent: Math.round((v.count / maxCount) * 100),
+    }));
   }
 
   async getRecentOrders(limit = 7) {
     const { data, error } = await supabase
       .from('orders')
       .select(`
-        id,
-        customer_name,
-        order_date,
-        total,
-        status,
+        id, customer_name, order_date, total, status,
         order_items (
           quantity,
           items ( name )
@@ -515,40 +428,23 @@ export class MenuService {
         cupParts.push(oi.quantity > 1 ? `${oi.quantity}× ${name}` : name);
       }
 
-      const orderDate = new Date(o.order_date);
-      const diffMs = Date.now() - orderDate.getTime();
-      const diffMins = Math.floor(diffMs / 60000);
-      let timeLabel: string;
-      if (diffMins < 1) timeLabel = 'just now';
-      else if (diffMins < 60) timeLabel = `${diffMins}m ago`;
-      else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
-      else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
+      const diffMins = Math.floor((Date.now() - new Date(o.order_date).getTime()) / 60000);
+      const timeLabel = diffMins < 1 ? 'just now' : diffMins < 60 ? `${diffMins}m ago` : diffMins < 1440 ? `${Math.floor(diffMins / 60)}h ago` : `${Math.floor(diffMins / 1440)}d ago`;
 
-      return {
-        id: `#${o.id}`,
-        customer: o.customer_name ?? 'Unknown',
-        time: timeLabel,
-        cup: cupParts.join(', ') || '—',
-        amount: o.total ?? 0,
-        status: o.status as 'delivered' | 'preparing' | 'cancelled' | 'pending',
-      };
+      return { id: `#${o.id}`, customer: o.customer_name ?? 'Unknown', time: timeLabel, cup: cupParts.join(', ') || '—', amount: o.total ?? 0, status: o.status as 'delivered' | 'preparing' | 'cancelled' | 'pending' };
     });
   }
 
   async getFlavourStats() {
-    const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - 6);
-    weekStart.setHours(0, 0, 0, 0);
+    const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 6); weekStart.setHours(0, 0, 0, 0);
 
     const [flavoursRes, scoopsRes] = await Promise.all([
       supabase.from('flavours').select('id, is_active'),
+      // Count from order_item_flavours joined through order_items → orders
       supabase
-        .from('order_flavours')
-        .select(`
-          flavour_id,
-          orders!inner ( order_date )
-        `)
-        .gte('orders.order_date', weekStart.toISOString()),
+        .from('order_item_flavours')
+        .select(`flavour_id, order_items!inner ( orders!inner ( order_date ) )`)
+        .gte('order_items.orders.order_date', weekStart.toISOString()),
     ]);
 
     if (flavoursRes.error) throw flavoursRes.error;

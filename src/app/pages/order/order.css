@@ -290,7 +290,19 @@
 .cup-rows {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+}
+
+/* Wraps the row + inline flavour picker */
+.cup-item {
+    border: 1.5px solid rgba(30, 25, 20, 0.28);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.cup-item:has(.item-flavour-picker) {
+    border-color: #B87333;
 }
 
 .cup-row {
@@ -298,25 +310,46 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    border: 1.5px solid rgba(30, 25, 20, 0.28);
-    border-radius: 18px;
-    transition: border-color 0.2s, background 0.2s;
+    background: transparent;
+    transition: background 0.2s;
 }
 
-.cup-row:hover {
-    border-color: #B87333;
+.cup-item:hover .cup-row {
+    background: rgba(184, 115, 51, 0.04);
 }
 
 .cup-row-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+}
+
+.cup-name-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
 
 .cup-name {
     font-size: 13px;
     font-weight: 600;
     color: #1A1610;
+}
+
+.cup-category-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 50px;
+    background: rgba(30, 25, 20, 0.08);
+    color: #7A5C3A;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.cup-category-badge.pack {
+    background: rgba(184, 115, 51, 0.15);
+    color: #B87333;
 }
 
 .cup-meta {
@@ -342,6 +375,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.18s;
+    flex-shrink: 0;
 }
 
 .qty-btn .material-icons {
@@ -380,29 +414,59 @@
     width: fit-content;
 }
 
-/* ── FLAVOURS ── */
-.flavours-selector {
+/* ── PER-ITEM FLAVOUR PICKER ── */
+.item-flavour-picker {
+    padding: 12px 16px 14px;
+    background: rgba(184, 115, 51, 0.05);
+    border-top: 1px dashed rgba(184, 115, 51, 0.35);
     display: flex;
     flex-direction: column;
     gap: 10px;
+    animation: fadeIn 0.2s ease;
 }
 
-.selected-flavours-row {
+.item-flavour-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.flavour-icon {
+    font-size: 15px !important;
+    color: #B87333;
+}
+
+.item-flavour-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1A1610;
+}
+
+.item-flavour-label em.flavour-hint {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 11px;
+    color: #9A9088;
+    margin-left: 3px;
+}
+
+.item-selected-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 6px;
+    margin-left: auto;
 }
 
 .selected-chip {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 50px;
     background: #1A1610;
     color: #fff;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
@@ -412,8 +476,16 @@
     background: #B87333;
 }
 
+.chip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
 .remove-icon {
-    font-size: 13px !important;
+    font-size: 12px !important;
 }
 
 .flavours-grid {
@@ -423,11 +495,11 @@
 }
 
 .flavour-chip {
-    padding: 7px 14px;
+    padding: 6px 12px;
     border-radius: 50px;
     border: 1.5px solid rgba(30, 25, 20, 0.28);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: #5A5248;
     display: flex;
@@ -448,6 +520,12 @@
     font-weight: 600;
 }
 
+.flavour-chip.disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .flavour-chip .dot {
     width: 9px;
     height: 9px;
@@ -456,9 +534,17 @@
     border: 1px solid rgba(0, 0, 0, 0.10);
 }
 
+.flavour-required-note {
+    font-size: 11px;
+    color: #C0784A;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+}
+
 /* ── PRICE LIST ── */
 .price-list {
-    margin-top: 0;
     border: 1.5px solid rgba(30, 25, 20, 0.28);
     border-radius: 18px;
     overflow: hidden;
@@ -622,22 +708,12 @@
 
 .receipt-edge--top {
     background: #F8F5F0;
-    clip-path: polygon(0% 100%, 3.33% 0%, 6.66% 100%, 10% 0%, 13.33% 100%, 16.66% 0%,
-            20% 100%, 23.33% 0%, 26.66% 100%, 30% 0%, 33.33% 100%, 36.66% 0%,
-            40% 100%, 43.33% 0%, 46.66% 100%, 50% 0%, 53.33% 100%, 56.66% 0%,
-            60% 100%, 63.33% 0%, 66.66% 100%, 70% 0%, 73.33% 100%, 76.66% 0%,
-            80% 100%, 83.33% 0%, 86.66% 100%, 90% 0%, 93.33% 100%, 96.66% 0%,
-            100% 100%);
+    clip-path: polygon(0% 100%, 3.33% 0%, 6.66% 100%, 10% 0%, 13.33% 100%, 16.66% 0%, 20% 100%, 23.33% 0%, 26.66% 100%, 30% 0%, 33.33% 100%, 36.66% 0%, 40% 100%, 43.33% 0%, 46.66% 100%, 50% 0%, 53.33% 100%, 56.66% 0%, 60% 100%, 63.33% 0%, 66.66% 100%, 70% 0%, 73.33% 100%, 76.66% 0%, 80% 100%, 83.33% 0%, 86.66% 100%, 90% 0%, 93.33% 100%, 96.66% 0%, 100% 100%);
 }
 
 .receipt-edge--bottom {
     background: #F8F5F0;
-    clip-path: polygon(0% 0%, 3.33% 100%, 6.66% 0%, 10% 100%, 13.33% 0%, 16.66% 100%,
-            20% 0%, 23.33% 100%, 26.66% 0%, 30% 100%, 33.33% 0%, 36.66% 100%,
-            40% 0%, 43.33% 100%, 46.66% 0%, 50% 100%, 53.33% 0%, 56.66% 100%,
-            60% 0%, 63.33% 100%, 66.66% 0%, 70% 100%, 73.33% 0%, 76.66% 100%,
-            80% 0%, 83.33% 100%, 86.66% 0%, 90% 100%, 93.33% 0%, 96.66% 100%,
-            100% 0%);
+    clip-path: polygon(0% 0%, 3.33% 100%, 6.66% 0%, 10% 100%, 13.33% 0%, 16.66% 100%, 20% 0%, 23.33% 100%, 26.66% 0%, 30% 100%, 33.33% 0%, 36.66% 100%, 40% 0%, 43.33% 100%, 46.66% 0%, 50% 100%, 53.33% 0%, 56.66% 100%, 60% 0%, 63.33% 100%, 66.66% 0%, 70% 100%, 73.33% 0%, 76.66% 100%, 80% 0%, 83.33% 100%, 86.66% 0%, 90% 100%, 93.33% 0%, 96.66% 100%, 100% 0%);
 }
 
 .receipt-inner {
@@ -678,7 +754,6 @@
 .receipt-divider {
     font-size: 11px;
     color: #888;
-    letter-spacing: 0;
     white-space: pre;
     overflow: hidden;
     margin: 5px 0;
@@ -745,19 +820,23 @@
     font-weight: 700;
 }
 
-.receipt-flavours {
+/* Per-item flavour line on receipt */
+.receipt-item-flavours {
     display: flex;
-    justify-content: space-between;
     gap: 6px;
-    font-size: 11px;
-    padding: 4px 0;
-    color: #555;
+    font-size: 10px;
+    padding: 0 0 4px 0;
+    color: #666;
 }
 
-.receipt-flavours>span:last-child {
-    font-weight: 700;
-    color: #1A1610;
-    text-align: right;
+.receipt-flavour-label {
+    flex-shrink: 0;
+    color: #888;
+}
+
+.receipt-item-flavours>span:last-child {
+    font-weight: 600;
+    color: #444;
 }
 
 .receipt-total-rows {
@@ -811,7 +890,6 @@
     display: flex;
     align-items: stretch;
     height: 36px;
-    gap: 0;
 }
 
 .barcode-bars span {
@@ -966,7 +1044,6 @@
    TABLET — ≤ 768px
 ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
-
     .order-page {
         padding: 16px 20px 32px;
     }
@@ -975,7 +1052,6 @@
         font-size: 24px;
     }
 
-    /* Progress: shrink circles + hide labels */
     .order-progress {
         padding: 14px 18px;
         border-radius: 24px;
@@ -996,13 +1072,11 @@
         margin-bottom: 14px;
     }
 
-    /* Form */
     .order-form {
         padding: 24px 20px;
         border-radius: 22px;
     }
 
-    /* Identity: stack columns */
     .identity-section {
         flex-direction: column;
         gap: 0;
@@ -1017,13 +1091,11 @@
         margin-top: 14px;
     }
 
-    /* Ice cream: stack columns */
     .icecream-section {
         flex-direction: column;
         gap: 20px;
     }
 
-    /* Move price list above the selectors on tablet — it becomes a summary strip */
     .icecream-right {
         order: -1;
     }
@@ -1032,13 +1104,11 @@
         margin-top: 0;
     }
 
-    /* Price table compact */
     .price-table th,
     .price-table td {
         padding: 8px 12px;
     }
 
-    /* Footer buttons full width */
     .form-footer {
         justify-content: stretch;
     }
@@ -1052,13 +1122,21 @@
         flex: 1;
         justify-content: center;
     }
+
+    .item-flavour-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-selected-chips {
+        margin-left: 0;
+    }
 }
 
 /* ═══════════════════════════════════════════
    MOBILE — ≤ 480px
 ═══════════════════════════════════════════ */
 @media (max-width: 480px) {
-
     .order-page {
         padding: 12px 14px 28px;
     }
@@ -1072,7 +1150,6 @@
         font-size: 12px;
     }
 
-    /* Progress: hide labels entirely, tiny circles */
     .order-progress {
         padding: 12px 14px;
         border-radius: 20px;
@@ -1094,18 +1171,15 @@
         margin-bottom: 0;
     }
 
-    /* Form */
     .order-form {
         padding: 18px 14px;
         border-radius: 18px;
         margin-bottom: 14px;
     }
 
-    /* Fields */
     .field input,
     .field textarea {
         font-size: 14px;
-        /* larger tap targets */
         padding: 12px 14px;
     }
 
@@ -1113,10 +1187,8 @@
         font-size: 11px;
     }
 
-    /* Cup rows */
     .cup-row {
         padding: 10px 12px;
-        border-radius: 14px;
     }
 
     .cup-name {
@@ -1137,13 +1209,15 @@
         min-width: 18px;
     }
 
-    /* Flavour chips */
+    .item-flavour-picker {
+        padding: 10px 12px 12px;
+    }
+
     .flavour-chip {
-        padding: 6px 11px;
+        padding: 5px 10px;
         font-size: 11px;
     }
 
-    /* Price table — hide scoops/servings column, show only name & price */
     .price-table th:nth-child(2),
     .price-table td:nth-child(2) {
         display: none;
@@ -1154,7 +1228,6 @@
         padding: 8px 10px;
     }
 
-    /* Payment */
     .payment-option {
         padding: 13px 14px;
         gap: 10px;
@@ -1173,7 +1246,6 @@
         font-size: 18px;
     }
 
-    /* Receipt */
     .receipt {
         max-width: 100%;
     }
@@ -1192,14 +1264,12 @@
         font-size: 14px !important;
     }
 
-    /* Footer buttons */
     .cancel-btn,
     .confirm {
         padding: 12px 16px;
         font-size: 13px;
     }
 
-    /* Success box */
     .success-box {
         padding: 32px 22px;
         border-radius: 20px;

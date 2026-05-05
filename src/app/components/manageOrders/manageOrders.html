@@ -69,6 +69,13 @@
           <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
         </select>
       </label>
+
+      <!-- REFRESH BUTTON -->
+      <button type="button" class="refresh-btn" [class.spinning]="isLoading" [disabled]="isLoading"
+        (click)="loadOrders()">
+        <span class="material-icons">refresh</span>
+        {{ isLoading ? 'Refreshing…' : 'Refresh' }}
+      </button>
     </div>
   </section>
 
@@ -128,7 +135,7 @@
                 <ng-container *ngIf="order.status === 'new'">
                   <button type="button" class="accept-btn" (click)="acceptOrder(order)">
                     <span class="material-icons">check_circle</span>
-                    <span>Accept</span>
+                    <span class="accept-label">Accept</span>
                   </button>
                 </ng-container>
 
@@ -142,10 +149,12 @@
                   </select>
 
                   <div class="menu-wrapper">
-                    <button class="menu-btn" type="button" (click)="toggleMenu(order.id)">
+                    <button class="menu-btn" type="button" (click)="toggleMenu(order.id, $event)">
                       <span class="material-icons">more_vert</span>
                     </button>
-                    <div class="action-menu" *ngIf="openMenuId === order.id">
+
+                    <!-- Fixed-position dropdown rendered via menuStyle -->
+                    <div class="action-menu" *ngIf="openMenuId === order.id" [ngStyle]="menuStyle">
                       <button class="action-menu__item" type="button" (click)="editOrder(order)">
                         <span class="material-icons">edit</span>
                         Order Summary
@@ -264,7 +273,7 @@
         </div>
       </div>
 
-      <!-- Items -->
+      <!-- Items (order_items from DB, aliased as order_cups in the component) -->
       <div class="drawer-section" *ngIf="selectedOrder.order_cups && selectedOrder.order_cups.length > 0">
         <h4 class="drawer-section-title">Items</h4>
         <div class="item-row" *ngFor="let item of selectedOrder.order_cups">

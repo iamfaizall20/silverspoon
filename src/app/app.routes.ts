@@ -25,10 +25,19 @@ export const routes: Routes = [
     { path: 'home', component: Landingpage },
     { path: 'login', component: Login },
     { path: 'login/reset', component: ResetPassword },
-    { path: 'signup', component: Signup },
-    { path: 'signup/confirm-email', component: confirmEmail },
-    { path: 'order/new', component: Order, },
-    { path: 'order/status', component: Myorders, canActivate: [authGuard] },
+    {
+        path: 'signup',
+        children: [
+            { path: '', component: Signup },
+            { path: 'confirm-email', component: confirmEmail }
+        ]
+    }, {
+        path: 'order',
+        children: [
+            { path: 'new', component: Order },
+            { path: 'status', component: Myorders, canActivate: [authGuard] }
+        ]
+    },
     { path: 'profile', component: Profile, canActivate: [authGuard] },
 
     // Admin Pages

@@ -1,62 +1,69 @@
-/* ── Page layout ─────────────────────────────────────────── */
+/* ══════════════════════════════════════
+   PAGE SHELL  (matches .signup-page)
+══════════════════════════════════════ */
 .confirm-page {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f5f6fa;
-    padding: 24px 16px;
+    background: #FFFCFB;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.4px;
 }
 
-/* ── Card ────────────────────────────────────────────────── */
+/* ── Card  (matches .form-wrap) ──────────────────────────── */
 .form-wrap {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 40px 36px 36px;
     width: 100%;
-    max-width: 440px;
-    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.08);
+    max-width: 380px;
+    position: relative;
+    z-index: 1;
 }
 
-/* ── Header (matches signup) ──────────────────────────────── */
+/* ── Header ───────────────────────────────────────────────── */
 .form-header {
     position: relative;
-    text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 }
 
 .form-header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #111827;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3vw, 34px);
+    color: #5C3D1E;
+    font-weight: 600;
+    letter-spacing: -0.4px;
     margin: 0 0 6px;
 }
 
 .form-header p {
     font-size: 14px;
-    color: #6b7280;
+    color: #7A6050;
+    letter-spacing: -0.3px;
     margin: 0;
 }
 
+/* ── Back button  (matches signup) ───────────────────────── */
 .back-btn {
-    position: absolute;
-    left: 0;
-    top: 0;
-    background: none;
     border: none;
+    background: rgba(200, 138, 74, 0.12);
+    padding: 8px;
+    border-radius: 50%;
     cursor: pointer;
-    color: #6b7280;
-    padding: 4px;
-    border-radius: 8px;
-    display: flex;
+    color: #5C3D1E;
+    margin-bottom: 12px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s, color 0.15s;
+    transition: all 0.2s ease;
 }
 
 .back-btn:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: #C88A4A;
+    color: #fff;
+    transform: translateX(-1px);
+}
+
+.back-btn .material-icons {
+    font-size: 18px;
 }
 
 /* ── Animated email icon ──────────────────────────────────── */
@@ -76,24 +83,25 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    background: linear-gradient(135deg, rgba(200, 138, 74, 0.18), rgba(200, 138, 74, 0.08));
+    border: 1.5px solid rgba(200, 138, 74, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(99, 82, 232, 0.2);
+    box-shadow: 0 4px 20px rgba(200, 138, 74, 0.18);
 }
 
 .email-icon {
     font-size: 34px;
-    color: #5b21b6;
+    color: #C88A4A;
 }
 
-/* Pulsing ring animation */
+/* Pulsing ring — gold tone */
 .ping-ring {
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: rgba(99, 82, 232, 0.12);
+    background: rgba(200, 138, 74, 0.1);
     animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
@@ -122,16 +130,17 @@
 
 .confirm-desc {
     font-size: 15px;
-    color: #374151;
-    margin: 0 0 10px;
+    color: #5C3D1E;
+    margin: 0 0 12px;
+    letter-spacing: -0.3px;
 }
 
 .email-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
+    background: rgba(200, 138, 74, 0.08);
+    border: 1px solid rgba(200, 138, 74, 0.22);
     border-radius: 100px;
     padding: 6px 14px;
     margin-bottom: 14px;
@@ -139,44 +148,46 @@
 
 .badge-icon {
     font-size: 16px;
-    color: #6b7280;
+    color: #C88A4A;
 }
 
 .email-text {
     font-size: 14px;
     font-weight: 600;
-    color: #111827;
+    color: #3A2210;
     word-break: break-all;
+    letter-spacing: -0.3px;
 }
 
 .confirm-sub {
     font-size: 14px;
-    color: #6b7280;
+    color: #7A6050;
     line-height: 1.6;
     margin: 0;
+    letter-spacing: -0.3px;
 }
 
-/* ── Divider (matches signup) ─────────────────────────────── */
+/* ── Divider  (matches signup) ────────────────────────────── */
 .divider {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 20px;
+    margin: 0 0 20px;
 }
 
 .divider span {
     flex: 1;
     height: 1px;
-    background: #e5e7eb;
+    background: rgba(200, 138, 74, 0.15);
 }
 
 .divider p {
     font-size: 12px;
-    color: #9ca3af;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 0;
+    color: #B09A88;
+    letter-spacing: -0.3px;
     white-space: nowrap;
+    margin: 0;
+    text-transform: uppercase;
 }
 
 /* ── Success banner ───────────────────────────────────────── */
@@ -184,19 +195,20 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #ecfdf5;
-    border: 1px solid #6ee7b7;
-    border-radius: 10px;
+    background: rgba(200, 138, 74, 0.08);
+    border: 1px solid rgba(200, 138, 74, 0.3);
+    border-radius: 12px;
     padding: 10px 14px;
     font-size: 14px;
-    color: #065f46;
+    color: #5C3D1E;
     margin-bottom: 14px;
+    letter-spacing: -0.3px;
     animation: fadeIn 0.3s ease;
 }
 
 .success-icon {
     font-size: 18px;
-    color: #059669;
+    color: #C88A4A;
     flex-shrink: 0;
 }
 
@@ -212,7 +224,9 @@
     }
 }
 
-/* ── Buttons ──────────────────────────────────────────────── */
+/* ══════════════════════════════════════
+   BUTTONS  (pill shape matching signup)
+══════════════════════════════════════ */
 .btn-resend,
 .btn-login {
     width: 100%;
@@ -220,27 +234,30 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 13px 20px;
-    border-radius: 12px;
+    padding: 14px 20px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
+    letter-spacing: -0.4px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
     text-decoration: none;
     box-sizing: border-box;
 }
 
-/* Resend — outlined style */
+/* Resend — outlined, matches google btn feel */
 .btn-resend {
-    background: transparent;
-    border: 2px solid #7c3aed;
-    color: #7c3aed;
+    background: #fff;
+    border: 1.5px solid rgba(200, 138, 74, 0.35);
+    color: #5C3D1E;
     margin-bottom: 12px;
 }
 
 .btn-resend:not(:disabled):hover {
-    background: #7c3aed;
-    color: #ffffff;
+    border-color: #C88A4A;
+    background: rgba(200, 138, 74, 0.06);
+    transform: translateY(-0.5px);
 }
 
 .btn-resend:disabled {
@@ -248,17 +265,18 @@
     cursor: not-allowed;
 }
 
-/* Login — filled style */
+/* Login — filled, matches .btn-signup */
 .btn-login {
-    background: #7c3aed;
-    border: 2px solid #7c3aed;
+    background: #C88A4A;
+    border: none;
     color: #ffffff;
     margin-bottom: 20px;
 }
 
 .btn-login:hover {
-    background: #6d28d9;
-    border-color: #6d28d9;
+    background: #5C3D1E;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(92, 61, 30, 0.2);
 }
 
 .btn-icon {
@@ -288,23 +306,25 @@
     justify-content: center;
     gap: 5px;
     font-size: 13px;
-    color: #9ca3af;
+    color: #B09A88;
     text-align: center;
     margin: 0;
+    letter-spacing: -0.3px;
 }
 
 .spam-icon {
     font-size: 14px;
-    color: #9ca3af;
+    color: #B09A88;
 }
 
 .spam-note strong {
-    color: #6b7280;
+    color: #7A6050;
 }
 
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 480px) {
     .form-wrap {
-        padding: 32px 20px 28px;
+        padding: 40px 0 28px;
+        max-width: 100%;
     }
 }
