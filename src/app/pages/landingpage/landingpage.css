@@ -1,10 +1,6 @@
-/* ══════════════════════════════════════
-   HERO
-══════════════════════════════════════ */
 .hero {
     padding-top: 64px;
     letter-spacing: -0.4px;
-    background: #FFFCFB;
     position: relative;
     overflow: hidden;
 }
@@ -50,7 +46,6 @@
     left: 0;
     right: 0;
     height: 65px;
-    background: #FFFCFB;
     clip-path: ellipse(55% 100% at 50% 100%);
     z-index: 2;
     pointer-events: none;
@@ -205,7 +200,6 @@
 ══════════════════════════════════════ */
 .flavours-section {
     padding: 80px 5% 100px;
-    background: #FFFCFB;
     font-family: 'DM Sans', sans-serif;
     letter-spacing: -0.4px;
     position: relative;
@@ -366,7 +360,6 @@
 ══════════════════════════════════════ */
 .featured-section {
     padding: 120px 5%;
-    background: #FFFCFB;
     font-family: 'DM Sans', sans-serif;
     letter-spacing: -0.4px;
     position: relative;
@@ -517,18 +510,6 @@
     transition: width 0.3s, height 0.3s;
 }
 
-.product-card::after {
-    content: '';
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 16px solid rgba(200, 138, 74, 0.06);
-    bottom: -24px;
-    left: -24px;
-    transition: transform 0.3s;
-}
-
 .product-card:hover {
     transform: translateY(-6px) scale(1.01);
     box-shadow: 0 16px 40px rgba(92, 61, 30, 0.12);
@@ -539,9 +520,6 @@
     height: 90px;
 }
 
-.product-card:hover::after {
-    transform: scale(1.3);
-}
 
 .product-card--pack {
     border-color: rgba(200, 138, 74, 0.22);
@@ -662,8 +640,6 @@
     left: 0;
     right: 0;
     height: 60px;
-    background: #FFFCFB;
-    clip-path: ellipse(55% 100% at 50% 0%);
 }
 
 .newsletter-section::after {

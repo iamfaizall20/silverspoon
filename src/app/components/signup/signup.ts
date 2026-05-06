@@ -58,7 +58,6 @@ export class Signup {
         this.fullName.trim()
       );
 
-      // Navigate to confirmation pending page, pass email as state
       this.router.navigate(['/signup/confirm-email'], {
         state: { email: this.email.trim() }
       });

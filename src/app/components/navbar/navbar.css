@@ -4,12 +4,9 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: #FFFCFB;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: white;
   border-bottom: 1px solid rgba(200, 138, 74, 0.15);
   padding: 0 5%;
-  font-family: 'DM Sans', sans-serif;
   letter-spacing: -0.4px;
 }
 
@@ -17,14 +14,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 72px;
 }
 
-/* ── Brand ── */
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   text-decoration: none;
 }
 
@@ -153,7 +149,6 @@
   top: calc(100% + 10px);
   right: 0;
   width: 200px;
-  background: #FFFCFB;
   border: 1px solid rgba(200, 138, 74, 0.18);
   border-radius: 16px;
   box-shadow:

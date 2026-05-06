@@ -70,7 +70,6 @@
         </select>
       </label>
 
-      <!-- REFRESH BUTTON -->
       <button type="button" class="refresh-btn" [class.spinning]="isLoading" [disabled]="isLoading"
         (click)="loadOrders()">
         <span class="material-icons">refresh</span>
@@ -153,7 +152,6 @@
                       <span class="material-icons">more_vert</span>
                     </button>
 
-                    <!-- Fixed-position dropdown rendered via menuStyle -->
                     <div class="action-menu" *ngIf="openMenuId === order.id" [ngStyle]="menuStyle">
                       <button class="action-menu__item" type="button" (click)="editOrder(order)">
                         <span class="material-icons">edit</span>
@@ -273,27 +271,32 @@
         </div>
       </div>
 
-      <!-- Items (order_items from DB, aliased as order_cups in the component) -->
+      <!-- Items — uses order_cups (mapped from order_items in loadOrders) -->
       <div class="drawer-section" *ngIf="selectedOrder.order_cups && selectedOrder.order_cups.length > 0">
         <h4 class="drawer-section-title">Items</h4>
         <div class="item-row" *ngFor="let item of selectedOrder.order_cups">
           <div class="item-info">
             <strong>{{ item.cups?.name || 'Item' }}</strong>
+            <!-- category pill: Cup or Pack -->
+            <span class="item-category-pill">
+              {{ (item.cups?.category === 'pack') ? 'Pack' : 'Cup' }}
+            </span>
             <span>
-              {{ item.cups?.scoops }} scoop{{ (item.cups?.scoops ?? '1') !== '1' ? 's' : '' }}
+              {{ item.cups?.scoops }} scoop{{ (item.cups?.scoops !== 1) ? 's' : '' }}
               &nbsp;·&nbsp; Qty: {{ item.quantity }}
             </span>
           </div>
-          <span class="item-price">Rs {{ item.price_at_time * item.quantity }}</span>
+          <span class="item-price">Rs {{ item.price_at_time * item.quantity | number }}</span>
         </div>
       </div>
 
-      <!-- Flavours -->
-      <div class="drawer-section" *ngIf="selectedOrder.order_flavours && selectedOrder.order_flavours.length > 0">
+      <!-- Flavours — rendered from the flattened order_flavours_flat array -->
+      <div class="drawer-section"
+        *ngIf="selectedOrder.order_flavours_flat && selectedOrder.order_flavours_flat.length > 0">
         <h4 class="drawer-section-title">Flavours</h4>
         <div class="flavour-chips">
-          <span class="flavour-chip" *ngFor="let f of selectedOrder.order_flavours">
-            {{ f.flavours.name || 'Flavour #' + f.flavour_id }}
+          <span class="flavour-chip" *ngFor="let f of selectedOrder.order_flavours_flat">
+            {{ f.name }}
           </span>
         </div>
       </div>
@@ -303,15 +306,15 @@
         <h4 class="drawer-section-title">Summary</h4>
         <div class="info-row">
           <span class="info-label">Subtotal</span>
-          <span>Rs {{ selectedOrder.subtotal }}</span>
+          <span>Rs {{ selectedOrder.subtotal | number }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Delivery Fee</span>
-          <span>Rs {{ selectedOrder.delivery_fee }}</span>
+          <span>Rs {{ selectedOrder.delivery_fee | number }}</span>
         </div>
         <div class="info-row total-row">
           <span class="info-label">Total</span>
-          <strong>Rs {{ selectedOrder.total }}</strong>
+          <strong>Rs {{ selectedOrder.total | number }}</strong>
         </div>
       </div>
 
@@ -320,7 +323,7 @@
 
   <!-- TOAST -->
   <div class="toast" [class.toast-visible]="toastVisible">
-    <span class="material-icons" style="font-size:18px; color:#6ED085;">check_circle</span>
+    <span class="material-icons" style="font-size:18px; color:#C88A4A;">check_circle</span>
     {{ toastMsg }}
   </div>
 

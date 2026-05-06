@@ -8,12 +8,13 @@ type OrderStatus = 'new' | 'pending' | 'out to delivery' | 'delivered' | 'cancel
 interface Cup {
   id: string;
   name: string;
-  scoops: string;
+  scoops: number;
   price: number;
   is_active: boolean;
+  category: 'cup' | 'pack';
 }
 
-interface flavour {
+interface Flavour {
   id: number;
   name: string;
   color: string;
@@ -26,13 +27,6 @@ interface OrderCup {
   quantity: number;
   price_at_time: number;
   cups?: Cup;
-}
-
-interface OrderFlavour {
-  id: number;
-  flavours: flavour;
-  order_id: number;
-  flavour_id?: number;
 }
 
 interface OrderRecord {
@@ -49,7 +43,11 @@ interface OrderRecord {
   status: OrderStatus;
   order_date: string;
   order_cups?: OrderCup[];
-  order_flavours?: OrderFlavour[];
+  /**
+   * Flattened list of unique flavour names/colors for this order,
+   * built by extracting order_item_flavours from each order_item.
+   */
+  order_flavours_flat?: { id: number; name: string; color: string }[];
 }
 
 @Component({
@@ -76,14 +74,10 @@ export class Orders implements OnInit {
   isLoading = false;
 
   openMenuId: number | null = null;
-
-  /**
-   * Holds the computed `top` / `right` for the fixed-position action dropdown.
-   * Calculated from the trigger button's bounding rect in toggleMenu().
-   */
   menuStyle: Record<string, string> = {};
 
   // ── Toast ─────────────────────────────────────────────────────────────────────
+
   toastVisible = false;
   toastMsg = '';
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
@@ -116,19 +110,12 @@ export class Orders implements OnInit {
     await this.loadOrders();
   }
 
-  // ─── Close menu on outside click / scroll ─────────────────────────────────────
-
   @HostListener('document:click')
-  onDocumentClick(): void {
-    this.openMenuId = null;
-  }
+  onDocumentClick(): void { this.openMenuId = null; }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    // Close the menu if the user scrolls so the fixed coords don't drift
-    if (this.openMenuId !== null) {
-      this.openMenuId = null;
-    }
+    if (this.openMenuId !== null) this.openMenuId = null;
   }
 
   // ─── Data Loading ─────────────────────────────────────────────────────────────
@@ -139,14 +126,33 @@ export class Orders implements OnInit {
     try {
       const data = await this.menuService.getOrders();
 
-      // Map order_items → order_cups so the drawer template can reference item.cups
-      this.orders = ((data as any[]) ?? []).map((o: any) => ({
-        ...o,
-        order_cups: (o.order_items ?? []).map((oi: any) => ({
+      this.orders = ((data as any[]) ?? []).map((o: any) => {
+
+        // Map order_items → order_cups so the drawer can use item.cups
+        const order_cups: OrderCup[] = (o.order_items ?? []).map((oi: any) => ({
           ...oi,
-          cups: oi.items ?? null,
-        })),
-      })) as OrderRecord[];
+          cups: oi.items
+            ? { ...oi.items, category: oi.items.category ?? 'cup' }
+            : null,
+        }));
+
+        // Flatten per-item flavours (order_item_flavours) into a deduplicated
+        // top-level array so the drawer can render them without nested loops.
+        const seen = new Set<number>();
+        const order_flavours_flat: { id: number; name: string; color: string }[] = [];
+
+        for (const oi of o.order_items ?? []) {
+          for (const oif of oi.order_item_flavours ?? []) {
+            const f = oif.flavours;
+            if (f && !seen.has(f.id)) {
+              seen.add(f.id);
+              order_flavours_flat.push({ id: f.id, name: f.name, color: f.color ?? '#B87333' });
+            }
+          }
+        }
+
+        return { ...o, order_cups, order_flavours_flat } as OrderRecord;
+      });
 
     } catch (error) {
       console.error('Error loading orders:', error);
@@ -165,10 +171,7 @@ export class Orders implements OnInit {
       : this.orders.filter(o => o.status === this.statusFilter);
 
     this.totalPages = Math.max(1, Math.ceil(this.filteredOrders.length / this.pageSize));
-
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages;
-    }
+    if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
   }
 
   get pagedOrders(): OrderRecord[] {
@@ -176,21 +179,14 @@ export class Orders implements OnInit {
     return this.filteredOrders.slice(start, start + this.pageSize);
   }
 
-  get hasOrders(): boolean {
-    return this.filteredOrders.length > 0;
-  }
+  get hasOrders(): boolean { return this.filteredOrders.length > 0; }
 
   get visiblePages(): number[] {
     const pages: number[] = [];
-    const total = this.totalPages;
-    const cur = this.currentPage;
-
+    const { totalPages: total, currentPage: cur } = this;
     pages.push(1);
-    for (let p = Math.max(2, cur - 1); p <= Math.min(total - 1, cur + 1); p++) {
-      pages.push(p);
-    }
+    for (let p = Math.max(2, cur - 1); p <= Math.min(total - 1, cur + 1); p++) pages.push(p);
     if (total > 1) pages.push(total);
-
     return [...new Set(pages)];
   }
 
@@ -206,17 +202,9 @@ export class Orders implements OnInit {
 
   // ─── Stats ────────────────────────────────────────────────────────────────────
 
-  get preparingCount(): number {
-    return this.orders.filter(o => o.status === 'pending').length;
-  }
-
-  get outForDeliveryCount(): number {
-    return this.orders.filter(o => o.status === 'out to delivery').length;
-  }
-
-  get deliveredCount(): number {
-    return this.orders.filter(o => o.status === 'delivered').length;
-  }
+  get preparingCount(): number { return this.orders.filter(o => o.status === 'pending').length; }
+  get outForDeliveryCount(): number { return this.orders.filter(o => o.status === 'out to delivery').length; }
+  get deliveredCount(): number { return this.orders.filter(o => o.status === 'delivered').length; }
 
   // ─── Pagination Controls ──────────────────────────────────────────────────────
 
@@ -254,12 +242,6 @@ export class Orders implements OnInit {
 
   // ─── Menu ─────────────────────────────────────────────────────────────────────
 
-  /**
-   * Toggle the ⋮ action menu.
-   * We use `position: fixed` for the dropdown so it is never clipped by the
-   * table's overflow. The position is calculated from the trigger button's
-   * viewport rect and stored in `menuStyle` which is bound via [ngStyle].
-   */
   toggleMenu(orderId: number, event?: Event): void {
     event?.stopPropagation();
 
@@ -268,19 +250,17 @@ export class Orders implements OnInit {
       return;
     }
 
-    // Compute position from the button element
     const btn = (event?.currentTarget ?? event?.target) as HTMLElement | null;
     if (btn) {
       const rect = btn.getBoundingClientRect();
-      const menuWidth = 160; // matches CSS min-width
       const spaceBelow = window.innerHeight - rect.bottom;
-      const openUpward = spaceBelow < 120; // flip if tight
+      const openUpward = spaceBelow < 120;
 
       this.menuStyle = {
         top: openUpward ? `${rect.top - 4}px` : `${rect.bottom + 6}px`,
         right: `${window.innerWidth - rect.right}px`,
         transform: openUpward ? 'translateY(-100%)' : 'none',
-        minWidth: `${menuWidth}px`,
+        minWidth: '160px',
       };
     }
 
@@ -324,8 +304,6 @@ export class Orders implements OnInit {
       await this.loadOrders();
     }
   }
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────────
 
   getStatusLabel(status: OrderStatus | 'all'): string {
     const map: Record<string, string> = {
