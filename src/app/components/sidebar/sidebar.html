@@ -1,6 +1,6 @@
-<!-- Hamburger (mobile only) -->
-<button class="hamburger" (click)="toggleSidebar()" aria-label="Toggle menu">
-    <span class="material-icons">{{ isOpen ? 'close' : 'menu' }}</span>
+<!-- Hamburger (mobile only — shown when sidebar is CLOSED) -->
+<button class="hamburger" (click)="toggleSidebar()" aria-label="Open menu" [class.hidden]="isOpen">
+    <span class="material-icons">menu</span>
 </button>
 
 <!-- Overlay (mobile only) -->
@@ -9,7 +9,7 @@
 <!-- Sidebar -->
 <div class="sidebar" [class.open]="isOpen">
 
-    <!-- Brand -->
+    <!-- Brand row: logo + close button (close only visible on mobile) -->
     <div class="sidebar-brand">
         <div class="brand-icon">
             <span class="material-icons">icecream</span>
@@ -18,6 +18,10 @@
             <h1 class="brand-name">SilverSpoon</h1>
             <p class="brand-sub">Admin Panel</p>
         </div>
+        <!-- Close button lives here on mobile — never overlaps logo -->
+        <button class="sidebar-close-btn" (click)="closeSidebar()" aria-label="Close menu">
+            <span class="material-icons">close</span>
+        </button>
     </div>
 
     <!-- Divider -->

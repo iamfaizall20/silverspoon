@@ -16,7 +16,7 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 16px rgba(92, 61, 30, 0.35);
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
 
 .hamburger:hover {
@@ -27,7 +27,38 @@
 .hamburger .material-icons {
     color: #fff;
     font-size: 22px;
-    transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+/* Hide hamburger when sidebar is open (close btn is inside sidebar instead) */
+.hamburger.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ─── CLOSE BUTTON (inside sidebar header, mobile only) ─── */
+.sidebar-close-btn {
+    display: none;
+    /* hidden on desktop */
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(92, 61, 30, 0.08);
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.sidebar-close-btn:hover {
+    background: rgba(92, 61, 30, 0.16);
+}
+
+.sidebar-close-btn .material-icons {
+    color: #5C3D1E;
+    font-size: 20px;
 }
 
 /* ─── OVERLAY (mobile only) ─── */
@@ -88,6 +119,12 @@
     color: #FFFCFB;
 }
 
+.brand-text {
+    flex: 1;
+    min-width: 0;
+    /* prevent text overflow pushing close btn out */
+}
+
 .brand-name {
     font-family: 'Playfair Display', serif;
     font-size: 18px;
@@ -95,6 +132,9 @@
     color: #5C3D1E;
     letter-spacing: -0.3px;
     line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .brand-sub {
@@ -159,7 +199,6 @@
     color: #C88A4A;
 }
 
-/* Active state */
 .nav-link.active {
     background: rgba(200, 138, 74, 0.12);
     color: #5C3D1E;
@@ -278,6 +317,11 @@
         display: block;
     }
 
+    /* Show close button inside sidebar brand row */
+    .sidebar-close-btn {
+        display: flex;
+    }
+
     /* Sidebar slides in from left */
     .sidebar {
         position: fixed;
@@ -295,9 +339,12 @@
         box-shadow: 8px 0 40px rgba(92, 61, 30, 0.18);
     }
 
-    /* Push brand down so it doesn't sit under the hamburger */
+    /*
+      Brand padding is normal — no need to push down
+      since the hamburger is now outside the sidebar
+      and the close button is inside the brand row.
+    */
     .sidebar-brand {
-        padding-top: 22px;
-        padding-left: 22px;
+        padding: 20px 16px 20px 20px;
     }
 }
