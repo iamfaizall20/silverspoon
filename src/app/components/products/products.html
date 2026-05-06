@@ -15,13 +15,13 @@
         <div class="tabs-bar">
             <button class="tab-btn" [class.tab-active]="activeTab === 'flavours'" (click)="setTab('flavours')">
                 <span class="material-icons tab-icon">palette</span>
-                Flavours
+                <span class="tab-label">Flavours</span>
                 <span class="tab-count">{{ flavours.length }}</span>
             </button>
 
             <button class="tab-btn" [class.tab-active]="activeTab === 'items'" (click)="setTab('items')">
                 <span class="material-icons tab-icon">local_cafe</span>
-                Items
+                <span class="tab-label">Items</span>
                 <span class="tab-count">{{ cupSizes.length }}</span>
             </button>
         </div>
@@ -46,7 +46,8 @@
                         <!-- Unavailable overlay badge -->
                         <span class="swatch-unavailable-badge" *ngIf="!f.is_active">Unavailable</span>
                         <div class="card-menu-wrap">
-                            <button class="icon-btn icon-menu" (click)="toggleMenu('f-' + i, $event)" title="Options">
+                            <button class="icon-btn icon-menu" (click)="toggleMenu('f-' + i, $event)"
+                                (touchend)="toggleMenu('f-' + i, $event)" title="Options">
                                 <span class="material-icons">more_vert</span>
                             </button>
                             <div class="dropdown-menu" [class.dropdown-open]="openMenuId === 'f-' + i">
@@ -73,7 +74,7 @@
                                 <span class="material-icons avail-icon">
                                     {{ f.is_active ? 'check_circle' : 'cancel' }}
                                 </span>
-                                {{ f.is_active ? 'Available' : 'Unavailable' }}
+                                <span class="avail-toggle-text">{{ f.is_active ? 'Available' : 'Unavailable' }}</span>
                             </button>
                         </div>
                         <p class="flavour-hex">{{ f.color }}</p>
@@ -143,13 +144,15 @@
                                         <span class="material-icons avail-icon">
                                             {{ c.is_active ? 'check_circle' : 'cancel' }}
                                         </span>
-                                        {{ c.is_active ? 'Available' : 'Unavailable' }}
+                                        <span class="avail-toggle-text">{{ c.is_active ? 'Available' : 'Unavailable'
+                                            }}</span>
                                     </button>
                                 </td>
                                 <td>
                                     <div class="menu-wrap">
                                         <button class="icon-btn icon-menu"
-                                            (click)="toggleMenu('c-' + getCupSizeIndex(c), $event)">
+                                            (click)="toggleMenu('c-' + getCupSizeIndex(c), $event)"
+                                            (touchend)="toggleMenu('c-' + getCupSizeIndex(c), $event)">
                                             <span class="material-icons">more_vert</span>
                                         </button>
                                         <div class="dropdown-menu"
@@ -208,13 +211,15 @@
                                         <span class="material-icons avail-icon">
                                             {{ c.is_active ? 'check_circle' : 'cancel' }}
                                         </span>
-                                        {{ c.is_active ? 'Available' : 'Unavailable' }}
+                                        <span class="avail-toggle-text">{{ c.is_active ? 'Available' : 'Unavailable'
+                                            }}</span>
                                     </button>
                                 </td>
                                 <td>
                                     <div class="menu-wrap">
                                         <button class="icon-btn icon-menu"
-                                            (click)="toggleMenu('c-' + getCupSizeIndex(c), $event)">
+                                            (click)="toggleMenu('c-' + getCupSizeIndex(c), $event)"
+                                            (touchend)="toggleMenu('c-' + getCupSizeIndex(c), $event)">
                                             <span class="material-icons">more_vert</span>
                                         </button>
                                         <div class="dropdown-menu"
@@ -250,10 +255,11 @@
          MODALS
     ════════════════════════════ -->
 
-    <div class="overlay" [class.overlay-visible]="modalOpen" (click)="closeModal()"></div>
+    <div class="overlay" [class.overlay-visible]="modalOpen" (click)="closeModal()" (touchend)="closeModal()"></div>
 
     <!-- FLAVOUR MODAL -->
-    <div class="modal" [class.modal-visible]="modalOpen && modalType === 'flavour'">
+    <div class="modal" [class.modal-visible]="modalOpen && modalType === 'flavour'" (click)="$event.stopPropagation()"
+        (touchend)="$event.stopPropagation()">
         <div class="modal-header">
             <h2 class="modal-title">{{ editIndex >= 0 ? 'Edit Flavour' : 'New Flavour' }}</h2>
             <button class="modal-close" (click)="closeModal()">
@@ -304,7 +310,8 @@
     </div>
 
     <!-- ITEM MODAL -->
-    <div class="modal" [class.modal-visible]="modalOpen && modalType === 'cup'">
+    <div class="modal" [class.modal-visible]="modalOpen && modalType === 'cup'" (click)="$event.stopPropagation()"
+        (touchend)="$event.stopPropagation()">
         <div class="modal-header">
             <h2 class="modal-title">{{ editIndex >= 0 ? 'Edit Item' : 'New Item' }}</h2>
             <button class="modal-close" (click)="closeModal()">
@@ -351,8 +358,10 @@
     </div>
 
     <!-- CONFIRM DELETE -->
-    <div class="overlay" [class.overlay-visible]="confirmOpen" (click)="confirmOpen = false"></div>
-    <div class="modal modal-sm" [class.modal-visible]="confirmOpen">
+    <div class="overlay" [class.overlay-visible]="confirmOpen" (click)="confirmOpen = false"
+        (touchend)="confirmOpen = false"></div>
+    <div class="modal modal-sm" [class.modal-visible]="confirmOpen" (click)="$event.stopPropagation()"
+        (touchend)="$event.stopPropagation()">
         <div class="modal-header">
             <h2 class="modal-title">Confirm Delete</h2>
             <button class="modal-close" (click)="confirmOpen = false">

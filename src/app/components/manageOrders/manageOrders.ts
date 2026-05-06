@@ -14,12 +14,16 @@ interface Cup {
   category: 'cup' | 'pack';
 }
 
-interface Flavour {
+interface ItemFlavour {
   id: number;
   name: string;
   color: string;
 }
 
+/**
+ * One line-item in the order.
+ * `flavours` holds the specific flavours chosen for THIS cup/pack.
+ */
 interface OrderCup {
   id: number;
   order_id: number;
@@ -27,6 +31,7 @@ interface OrderCup {
   quantity: number;
   price_at_time: number;
   cups?: Cup;
+  flavours: ItemFlavour[];   // per-item flavours from order_item_flavours
 }
 
 interface OrderRecord {
@@ -43,11 +48,6 @@ interface OrderRecord {
   status: OrderStatus;
   order_date: string;
   order_cups?: OrderCup[];
-  /**
-   * Flattened list of unique flavour names/colors for this order,
-   * built by extracting order_item_flavours from each order_item.
-   */
-  order_flavours_flat?: { id: number; name: string; color: string }[];
 }
 
 @Component({
@@ -128,30 +128,33 @@ export class Orders implements OnInit {
 
       this.orders = ((data as any[]) ?? []).map((o: any) => {
 
-        // Map order_items → order_cups so the drawer can use item.cups
-        const order_cups: OrderCup[] = (o.order_items ?? []).map((oi: any) => ({
-          ...oi,
-          cups: oi.items
-            ? { ...oi.items, category: oi.items.category ?? 'cup' }
-            : null,
-        }));
+        // For every order_item, extract its own flavours from order_item_flavours
+        const order_cups: OrderCup[] = (o.order_items ?? []).map((oi: any) => {
 
-        // Flatten per-item flavours (order_item_flavours) into a deduplicated
-        // top-level array so the drawer can render them without nested loops.
-        const seen = new Set<number>();
-        const order_flavours_flat: { id: number; name: string; color: string }[] = [];
+          // Build the per-item flavour list
+          const flavours: ItemFlavour[] = (oi.order_item_flavours ?? [])
+            .map((oif: any) => oif.flavours)
+            .filter(Boolean)
+            .map((f: any) => ({
+              id: f.id,
+              name: f.name ?? 'Unknown',
+              color: f.color ?? '#B87333',
+            }));
 
-        for (const oi of o.order_items ?? []) {
-          for (const oif of oi.order_item_flavours ?? []) {
-            const f = oif.flavours;
-            if (f && !seen.has(f.id)) {
-              seen.add(f.id);
-              order_flavours_flat.push({ id: f.id, name: f.name, color: f.color ?? '#B87333' });
-            }
-          }
-        }
+          return {
+            id: oi.id,
+            order_id: oi.order_id,
+            cup_id: oi.cup_id,
+            quantity: oi.quantity,
+            price_at_time: oi.price_at_time,
+            cups: oi.items
+              ? { ...oi.items, category: oi.items.category ?? 'cup' }
+              : undefined,
+            flavours,
+          } as OrderCup;
+        });
 
-        return { ...o, order_cups, order_flavours_flat } as OrderRecord;
+        return { ...o, order_cups } as OrderRecord;
       });
 
     } catch (error) {
@@ -244,18 +247,12 @@ export class Orders implements OnInit {
 
   toggleMenu(orderId: number, event?: Event): void {
     event?.stopPropagation();
-
-    if (this.openMenuId === orderId) {
-      this.openMenuId = null;
-      return;
-    }
+    if (this.openMenuId === orderId) { this.openMenuId = null; return; }
 
     const btn = (event?.currentTarget ?? event?.target) as HTMLElement | null;
     if (btn) {
       const rect = btn.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const openUpward = spaceBelow < 120;
-
+      const openUpward = window.innerHeight - rect.bottom < 120;
       this.menuStyle = {
         top: openUpward ? `${rect.top - 4}px` : `${rect.bottom + 6}px`,
         right: `${window.innerWidth - rect.right}px`,
@@ -263,15 +260,12 @@ export class Orders implements OnInit {
         minWidth: '160px',
       };
     }
-
     this.openMenuId = orderId;
   }
 
   // ─── Order Actions ────────────────────────────────────────────────────────────
 
-  acceptOrder(order: OrderRecord): void {
-    this.updateOrderStatus(order.id, 'pending');
-  }
+  acceptOrder(order: OrderRecord): void { this.updateOrderStatus(order.id, 'pending'); }
 
   onStatusDropdownChange(order: OrderRecord, newStatus: string): void {
     this.updateOrderStatus(order.id, newStatus as OrderStatus);
@@ -288,7 +282,6 @@ export class Orders implements OnInit {
   }
 
   async updateOrderStatus(orderId: number, status: OrderStatus): Promise<void> {
-    // Optimistic update
     this.orders = this.orders.map(o => o.id === orderId ? { ...o, status } : o);
     if (this.selectedOrder?.id === orderId) {
       this.selectedOrder = { ...this.selectedOrder, status };
@@ -305,6 +298,8 @@ export class Orders implements OnInit {
     }
   }
 
+  // ─── Helpers ──────────────────────────────────────────────────────────────────
+
   getStatusLabel(status: OrderStatus | 'all'): string {
     const map: Record<string, string> = {
       all: 'All',
@@ -317,7 +312,5 @@ export class Orders implements OnInit {
     return map[status] ?? status;
   }
 
-  trackByOrderId(_: number, order: OrderRecord): number {
-    return order.id;
-  }
+  trackByOrderId(_: number, order: OrderRecord): number { return order.id; }
 }

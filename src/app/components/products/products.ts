@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../services/menu.service.ts';
 
@@ -35,13 +35,16 @@ type DeleteTarget = 'flavour' | 'cup';
 })
 export class Products implements OnInit {
 
-  constructor(private menuService: MenuService) { }
+  constructor(private menuService: MenuService, private ngZone: NgZone) { }
 
   // ── ACTIVE TAB ──
   activeTab: TabType = 'flavours';
 
   // ── DROPDOWN MENU ──
   openMenuId: string | null = null;
+
+  // ── Used to distinguish an outside-click from a button click ──
+  private _menuClickedThisTick = false;
 
   // ── MODAL STATE ──
   modalOpen = false;
@@ -92,15 +95,32 @@ export class Products implements OnInit {
     this.loadCups();
   }
 
-  // ── CLOSE DROPDOWN ON OUTSIDE CLICK ──
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    this.openMenuId = null;
+  // ── CLOSE DROPDOWN ON OUTSIDE CLICK / TAP ──
+  // Uses a flag set by toggleMenu() so the handler that opens the menu
+  // and this handler don't fight each other on touch devices.
+  @HostListener('document:click', ['$event'])
+  @HostListener('document:touchend', ['$event'])
+  onDocumentInteraction(event: Event): void {
+    if (this._menuClickedThisTick) {
+      // The click/tap originated from a menu-toggle button — don't close.
+      this._menuClickedThisTick = false;
+      return;
+    }
+    if (this.openMenuId !== null) {
+      this.openMenuId = null;
+    }
   }
 
   // ── DROPDOWN MENU HELPERS ──
-  toggleMenu(id: string, event: Event): void {
+  toggleMenu(id: string, event: MouseEvent | TouchEvent): void {
+    // Prevent the event from bubbling to the document listener above.
     event.stopPropagation();
+    // Also prevent ghost click on touch devices (touchend → click 300 ms later).
+    event.preventDefault();
+
+    // Set the flag so the document handler knows this tick was a menu toggle.
+    this._menuClickedThisTick = true;
+
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 

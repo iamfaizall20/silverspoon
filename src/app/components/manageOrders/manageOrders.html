@@ -130,7 +130,7 @@
             <td>
               <div class="action-cell" (click)="$event.stopPropagation()">
 
-                <!-- NEW: Accept button only -->
+                <!-- NEW -->
                 <ng-container *ngIf="order.status === 'new'">
                   <button type="button" class="accept-btn" (click)="acceptOrder(order)">
                     <span class="material-icons">check_circle</span>
@@ -138,7 +138,7 @@
                   </button>
                 </ng-container>
 
-                <!-- ACTIVE: status dropdown + ⋮ menu -->
+                <!-- ACTIVE -->
                 <ng-container *ngIf="order.status !== 'new' && order.status !== 'cancelled'">
                   <select class="status-select" [ngModel]="order.status"
                     (ngModelChange)="onStatusDropdownChange(order, $event)">
@@ -166,7 +166,7 @@
                   </div>
                 </ng-container>
 
-                <!-- CANCELLED: no actions -->
+                <!-- CANCELLED -->
                 <ng-container *ngIf="order.status === 'cancelled'">
                   <span class="cancelled-label">—</span>
                 </ng-container>
@@ -271,33 +271,43 @@
         </div>
       </div>
 
-      <!-- Items — uses order_cups (mapped from order_items in loadOrders) -->
+      <!--
+        Items — each card shows:
+          • Item name + Cup/Pack pill + Qty + Price
+          • Flavours chosen specifically for THAT item as chips
+      -->
       <div class="drawer-section" *ngIf="selectedOrder.order_cups && selectedOrder.order_cups.length > 0">
         <h4 class="drawer-section-title">Items</h4>
-        <div class="item-row" *ngFor="let item of selectedOrder.order_cups">
-          <div class="item-info">
-            <strong>{{ item.cups?.name || 'Item' }}</strong>
-            <!-- category pill: Cup or Pack -->
-            <span class="item-category-pill">
-              {{ (item.cups?.category === 'pack') ? 'Pack' : 'Cup' }}
-            </span>
-            <span>
-              {{ item.cups?.scoops }} scoop{{ (item.cups?.scoops !== 1) ? 's' : '' }}
-              &nbsp;·&nbsp; Qty: {{ item.quantity }}
+
+        <div class="item-card" *ngFor="let item of selectedOrder.order_cups">
+
+          <!-- top row: name, category, qty, price -->
+          <div class="item-card__header">
+            <div class="item-card__meta">
+              <strong class="item-card__name">{{ item.cups?.name || 'Item' }}</strong>
+              <div class="item-card__tags">
+                <span class="item-category-pill">
+                  {{ item.cups?.category === 'pack' ? 'Pack' : 'Cup' }}
+                </span>
+                <span class="item-qty-badge">× {{ item.quantity }}</span>
+              </div>
+            </div>
+            <span class="item-price">Rs {{ item.price_at_time * item.quantity | number }}</span>
+          </div>
+
+          <!-- flavour chips for this item -->
+          <div class="item-card__flavours" *ngIf="item.flavours && item.flavours.length > 0">
+            <span class="flavour-chip" *ngFor="let f of item.flavours" [style.background]="f.color + '22'"
+              [style.border-color]="f.color + '66'" [style.color]="'#3b1e06'">
+              {{ f.name }}
             </span>
           </div>
-          <span class="item-price">Rs {{ item.price_at_time * item.quantity | number }}</span>
-        </div>
-      </div>
 
-      <!-- Flavours — rendered from the flattened order_flavours_flat array -->
-      <div class="drawer-section"
-        *ngIf="selectedOrder.order_flavours_flat && selectedOrder.order_flavours_flat.length > 0">
-        <h4 class="drawer-section-title">Flavours</h4>
-        <div class="flavour-chips">
-          <span class="flavour-chip" *ngFor="let f of selectedOrder.order_flavours_flat">
-            {{ f.name }}
-          </span>
+          <!-- no flavours assigned -->
+          <div class="item-card__no-flavours" *ngIf="!item.flavours || item.flavours.length === 0">
+            <span class="material-icons">ice_skating</span> No flavours selected
+          </div>
+
         </div>
       </div>
 
