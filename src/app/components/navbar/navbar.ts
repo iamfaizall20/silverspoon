@@ -6,6 +6,7 @@ interface StoredUser {
   name: string;
   email: string;
   isLoggedIn: boolean;
+  role: string;
 }
 
 @Component({
@@ -27,22 +28,28 @@ export class Navbar implements OnInit {
   }
 
   private loadUserFromStorage(): void {
+
     try {
       const raw = localStorage.getItem('user');
       if (!raw) return;
 
       const parsed: StoredUser = JSON.parse(raw);
 
-      if (parsed?.isLoggedIn && parsed?.name?.trim()) {
+      if (parsed?.isLoggedIn) {
         this.user = parsed;
-        this.userInitial = parsed.name.trim().charAt(0).toUpperCase();
+
+        this.userInitial =
+          parsed.name?.trim().charAt(0).toUpperCase();
+
+        if (parsed.role === 'admin') {
+          console.log('Admin Logged In');
+        }
       }
     } catch {
       this.user = null;
       this.userInitial = '';
     }
   }
-
   toggleDropdown(): void {
     this.dropdownOpen = !this.dropdownOpen;
   }

@@ -150,6 +150,7 @@
   right: 0;
   width: 200px;
   border: 1px solid rgba(200, 138, 74, 0.18);
+  background: #ffff;
   border-radius: 16px;
   box-shadow:
     0 4px 6px -1px rgba(92, 61, 30, 0.08),
@@ -245,7 +246,6 @@
 
 .dropdown-item:hover {
   background: rgba(200, 138, 74, 0.1);
-  color: #C88A4A;
 }
 
 .dropdown-item:hover svg {
