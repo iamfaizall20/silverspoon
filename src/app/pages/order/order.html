@@ -305,9 +305,17 @@
     <!-- ── SUCCESS DIALOG ── -->
     <div class="success-dialog" [class.visible]="showSuccess">
         <div class="success-box">
-            <div class="success-icon">🎉</div>
+            <div class="success-icon">
+                <span class="material-icons">check_circle</span>
+            </div>
             <h2>Order Confirmed!</h2>
-            <p>Your ice cream is on its way. Redirecting you to the home page shortly.</p>
+            <p>Copy your order ID below, then log in or sign up to track your delivery status.</p>
+            <div class="order-id-row">
+                <span class="order-id-text">{{ orderNumber }}</span>
+                <button class="copy-id-btn" (click)="copyOrderId()" [attr.aria-label]="'Copy order ID'">
+                    <span class="material-icons">{{ copied ? 'check' : 'content_copy' }}</span>
+                </button>
+            </div>
             <button class="success-btn" (click)="goHome()">Go to Home</button>
         </div>
     </div>
@@ -318,13 +326,14 @@
             <button class="cancel-btn" (click)="currentStep > 1 ? prevStep() : cancelOrder()">
                 {{ currentStep > 1 ? 'Back' : 'Cancel' }}
             </button>
-            <button class="confirm" (click)="nextStep()" [disabled]="isNextDisabled">
-                {{ confirmLabel }}
-                <span class="material-icons" style="font-size:16px">
+            <button class="confirm" (click)="nextStep()" [disabled]="isNextDisabled || isPlacingOrder">
+                <span class="btn-spinner" *ngIf="isPlacingOrder"></span>
+                <span *ngIf="!isPlacingOrder">{{ confirmLabel }}</span>
+                <span *ngIf="isPlacingOrder">Placing order…</span>
+                <span class="material-icons" style="font-size:16px" *ngIf="!isPlacingOrder">
                     {{ currentStep === totalSteps ? 'check_circle' : 'arrow_forward' }}
                 </span>
             </button>
         </div>
     </div>
-
 </div>

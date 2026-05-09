@@ -20,6 +20,7 @@ export class Navbar implements OnInit {
   user: StoredUser | null = null;
   userInitial: string = '';
   dropdownOpen: boolean = false;
+  mobileMenuOpen: boolean = false;
 
   constructor(private router: Router) { }
 
@@ -28,7 +29,6 @@ export class Navbar implements OnInit {
   }
 
   private loadUserFromStorage(): void {
-
     try {
       const raw = localStorage.getItem('user');
       if (!raw) return;
@@ -37,9 +37,7 @@ export class Navbar implements OnInit {
 
       if (parsed?.isLoggedIn) {
         this.user = parsed;
-
-        this.userInitial =
-          parsed.name?.trim().charAt(0).toUpperCase();
+        this.userInitial = parsed.name?.trim().charAt(0).toUpperCase();
 
         if (parsed.role === 'admin') {
           console.log('Admin Logged In');
@@ -50,8 +48,17 @@ export class Navbar implements OnInit {
       this.userInitial = '';
     }
   }
+
   toggleDropdown(): void {
     this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
   }
 
   @HostListener('document:click', ['$event'])
@@ -60,6 +67,15 @@ export class Navbar implements OnInit {
     if (!target.closest('.user-profile')) {
       this.dropdownOpen = false;
     }
+    if (!target.closest('.mobile-drawer') && !target.closest('.hamburger')) {
+      this.mobileMenuOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.dropdownOpen = false;
+    this.mobileMenuOpen = false;
   }
 
   onMyProfile(): void {
@@ -74,6 +90,7 @@ export class Navbar implements OnInit {
 
   onLogout(): void {
     this.dropdownOpen = false;
+    this.mobileMenuOpen = false;
     localStorage.removeItem('user');
     this.user = null;
     this.userInitial = '';

@@ -1,38 +1,39 @@
 /* ══════════════════════════════════════
-   CSS VARIABLES
+   GLOBAL RESET — TOUCH FOUNDATION
+   These three rules fix the majority of
+   "tap doesn't register" issues on iOS/Android.
 ══════════════════════════════════════ */
-:root {
-  --black: #0a0a0a;
-  --black-soft: #1a1a1a;
-  --grey-dark: #3a3a3a;
-  --grey-mid: #6b6b6b;
-  --grey-light: #9a9a9a;
-  --gold: #b87333;
-  --gold-dark: #7a4e22;
-  --gold-soft: rgba(184, 115, 51, 0.12);
-  --gold-border: rgba(184, 115, 51, 0.25);
-  --cream: #fdf8f3;
-  --white: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --border-slim: rgba(0, 0, 0, 0.06);
-  --radius-card: 16px;
-  --radius-pill: 999px;
-  --transition: 0.18s ease;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  /* Removes the 300ms click delay on all
+     modern mobile browsers */
+  touch-action: manipulation;
+}
+
+/* Buttons and links must never suppress
+   pointer events accidentally */
+button,
+a,
+select,
+input,
+label {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.06);
 }
 
 /* ══════════════════════════════════════
    BASE
 ══════════════════════════════════════ */
-* {
-  box-sizing: border-box;
-}
-
 .orders-page {
   min-height: 100vh;
-  color: var(--black);
-  /* prevent horizontal scroll on mobile */
+  color: #1a1610;
+  /* Prevent horizontal bleed on mobile */
   overflow-x: hidden;
   width: 100%;
+  /* Allow page to scroll normally */
+  overscroll-behavior-y: auto;
 }
 
 /* ══════════════════════════════════════
@@ -44,8 +45,8 @@
 
 .header-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(22px, 5vw, 32px);
-  color: var(--black);
+  font-size: clamp(20px, 5vw, 32px);
+  color: #1a1610;
   margin: 0 0 6px;
   line-height: 1.15;
 }
@@ -53,7 +54,7 @@
 .header-description {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--grey-mid);
+  color: #5d544b;
   max-width: 680px;
   margin: 0;
 }
@@ -73,13 +74,13 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border);
-  background: var(--white);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  /* touch-action fix */
-  touch-action: auto;
-  -webkit-tap-highlight-color: transparent;
+  border-radius: 16px;
+  border: 1px solid rgba(30, 25, 20, 0.1);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  /* Prevent text selection on tap */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .stat-card__label {
@@ -88,7 +89,7 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--grey-mid);
+  color: #8a7d71;
   margin-bottom: 3px;
 }
 
@@ -96,7 +97,7 @@
   display: block;
   font-size: 24px;
   font-weight: 700;
-  color: var(--black);
+  color: #1a1610;
   line-height: 1;
 }
 
@@ -110,19 +111,20 @@
   flex-shrink: 0;
 }
 
+/* Icon chips — warm amber tones matching products page */
 .icon-chip--amber {
-  background: rgba(184, 115, 51, 0.12);
-  color: var(--gold-dark);
+  background: rgba(184, 115, 51, 0.14);
+  color: #7A4E22;
 }
 
 .icon-chip--violet {
-  background: rgba(184, 115, 51, 0.18);
-  color: #6b3a0a;
+  background: rgba(122, 78, 34, 0.12);
+  color: #5d3a10;
 }
 
 .icon-chip--green {
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--black-soft);
+  background: rgba(46, 125, 82, 0.12);
+  color: #2E7D52;
 }
 
 .icon-chip .material-icons {
@@ -139,22 +141,22 @@
   gap: 12px;
   padding: 14px 16px;
   margin-bottom: 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  background: var(--white);
+  border: 1px solid rgba(30, 25, 20, 0.1);
+  border-radius: 16px;
+  background: #ffffff;
   flex-wrap: wrap;
 }
 
 .toolbar-copy h2 {
   font-family: 'Playfair Display', serif;
   font-size: 17px;
-  color: var(--black);
+  color: #1a1610;
   margin: 0 0 2px;
 }
 
 .toolbar-copy p {
   font-size: 12px;
-  color: var(--grey-mid);
+  color: #5d544b;
   margin: 0;
 }
 
@@ -177,33 +179,34 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--grey-mid);
+  color: #8a7d71;
 }
 
-.toolbar-field select,
-.status-select {
+/* Toolbar selects — match products page .form-select */
+.toolbar-field select {
   height: 38px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--white);
-  color: var(--black);
-  padding: 0 10px;
+  border: 1.5px solid rgba(30, 25, 20, 0.18);
+  background: #FAFAF8;
+  color: #161210;
+  padding: 0 12px;
   outline: none;
-  font: inherit;
-  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  /* ≥ 14px prevents iOS auto-zoom on focus */
+  font-weight: 500;
   cursor: pointer;
-  transition: border-color var(--transition), box-shadow var(--transition);
   -webkit-appearance: none;
   appearance: none;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.toolbar-field select:focus,
-.status-select:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.12);
+.toolbar-field select:focus {
+  border-color: #B87333;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.10);
 }
 
 .refresh-btn {
@@ -211,32 +214,29 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  height: 38px;
-  padding: 0 14px;
+  min-height: 44px;
+  padding: 0 16px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--white);
-  color: var(--grey-dark);
+  border: 1px solid rgba(30, 25, 20, 0.1);
+  background: #ffffff;
+  color: #5d544b;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   align-self: flex-end;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
-  transition: background var(--transition), border-color var(--transition),
-    color var(--transition);
+  /* Remove transform on mobile — causes layout jank */
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 
 .refresh-btn:hover:not(:disabled),
 .refresh-btn:active:not(:disabled) {
-  background: #f5f5f5;
-  border-color: var(--gold);
-  color: var(--black);
+  background: #f7efe6;
+  border-color: #b87333;
+  color: #7a4e22;
 }
 
 .refresh-btn:disabled {
@@ -246,7 +246,6 @@
 
 .refresh-btn .material-icons {
   font-size: 17px;
-  transition: transform 0.5s ease;
 }
 
 .refresh-btn.spinning .material-icons {
@@ -265,30 +264,39 @@
 
 /* ══════════════════════════════════════
    TABLE SHELL
+   KEY FIX: overflow on the shell must NOT
+   be `visible` on mobile — that blocks the
+   touch-scroll container from working.
+   We clip the shell but keep the scroll div
+   scrollable, and handle the action-menu
+   with `position: fixed` instead.
 ══════════════════════════════════════ */
 .orders-table-shell {
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border);
-  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid rgba(30, 25, 20, 0.1);
+  background: #ffffff;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-  /* MUST be visible so action menu isn't clipped */
-  overflow: visible;
   width: 100%;
+  /* Allow children to set their own overflow */
+  overflow: hidden;
 }
 
 .orders-table-scroll {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: var(--radius-card);
   overflow-y: visible;
-  /* smooth scroll on iOS */
-  scroll-behavior: smooth;
+  /* iOS momentum scrolling */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent the browser scrolling the whole page
+     when the user is swiping the table */
+  overscroll-behavior-x: contain;
+  /* Visual rounding preserved via border-radius on the shell */
 }
 
 .orders-table {
   width: 100%;
-  min-width: 560px;
+  /* Reduced min-width so fewer cols need hiding */
+  min-width: 480px;
   border-collapse: collapse;
   table-layout: auto;
 }
@@ -300,26 +308,31 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--grey-mid);
-  background: #f8f8f8;
-  border-bottom: 1px solid var(--border);
+  color: #8a7d71;
+  background: linear-gradient(180deg, #fbf7f2 0%, #f3ece3 100%);
+  border-bottom: 1px solid rgba(30, 25, 20, 0.1);
   white-space: nowrap;
+  /* Prevent accidental text selection */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .orders-table thead th:first-child {
-  border-top-left-radius: var(--radius-card);
+  border-top-left-radius: 16px;
 }
 
 .orders-table thead th:last-child {
-  border-top-right-radius: var(--radius-card);
+  border-top-right-radius: 16px;
 }
 
 .orders-table tbody td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-slim);
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(30, 25, 20, 0.06);
   vertical-align: middle;
   font-size: 13px;
-  color: var(--black);
+  color: #1a1610;
+  /* Keep overflow visible so the fixed-position
+     action menu is not clipped at the cell level */
   overflow: visible;
 }
 
@@ -327,11 +340,11 @@
   border-bottom: none;
 }
 
+/* ── Clickable rows — tap-friendly ── */
 .clickable-row {
   cursor: pointer;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.04);
+  /* Improves tap registration on Android WebView */
+  -webkit-tap-highlight-color: rgba(184, 115, 51, 0.06);
   user-select: none;
   -webkit-user-select: none;
   transition: background 0.12s;
@@ -339,7 +352,7 @@
 
 .clickable-row:hover td,
 .clickable-row:active td {
-  background: #f9f9f9;
+  background: #fdfaf7;
 }
 
 /* ── Cell layouts ─────────────────── */
@@ -356,20 +369,22 @@
 .contact-cell strong {
   font-size: 13px;
   font-weight: 700;
-  color: var(--black);
+  color: #1a1610;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 180px;
 }
 
 .order-id span,
 .customer-cell span,
 .contact-cell span {
   font-size: 12px;
-  color: var(--grey-mid);
+  color: #8a7d71;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 180px;
 }
 
 /* ══════════════════════════════════════
@@ -378,43 +393,51 @@
 .status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
+  padding: 5px 12px;
+  border-radius: 50px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   white-space: nowrap;
-  border: 1px solid transparent;
+  border: 1.5px solid;
+  pointer-events: none;
+  line-height: 1.2;
 }
 
+/* New Order — warm amber */
 .status-badge--new {
-  background: rgba(184, 115, 51, 0.12);
-  color: #7a4e22;
-  border-color: rgba(184, 115, 51, 0.2);
+  background: rgba(184, 115, 51, 0.13);
+  color: #7A4E22;
+  border-color: rgba(184, 115, 51, 0.38);
 }
 
+/* Preparing — mid brown */
 .status-badge--preparing {
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--black-soft);
-  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(122, 78, 34, 0.11);
+  color: #5d3a10;
+  border-color: rgba(122, 78, 34, 0.32);
 }
 
+/* Out for Delivery — darker brown */
 .status-badge--out-for-delivery {
-  background: rgba(184, 115, 51, 0.18);
-  color: #6b3a0a;
-  border-color: rgba(184, 115, 51, 0.3);
+  background: rgba(26, 22, 16, 0.08);
+  color: #3b2a1a;
+  border-color: rgba(26, 22, 16, 0.24);
 }
 
+/* Delivered — green (matches products avail-on) */
 .status-badge--delivered {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--grey-dark);
-  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(46, 125, 82, 0.10);
+  color: #2E7D52;
+  border-color: rgba(46, 125, 82, 0.30);
 }
 
+/* Cancelled — red (matches products dropdown-danger) */
 .status-badge--cancelled {
-  background: rgba(220, 38, 38, 0.08);
-  color: #b91c1c;
-  border-color: rgba(220, 38, 38, 0.15);
+  background: rgba(192, 57, 43, 0.09);
+  color: #C0392B;
+  border-color: rgba(192, 57, 43, 0.30);
 }
 
 /* ══════════════════════════════════════
@@ -424,55 +447,78 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  /* stop row click propagating from buttons */
+  /* Isolate touches inside action cell from
+     the row's (click) handler */
 }
 
-/* ── Accept button ────────────────── */
+/* ── Accept button — pill style matching products .btn-primary ── */
 .accept-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
   height: 36px;
-  padding: 0 14px;
-  border-radius: 10px;
+  padding: 0 18px;
+  border-radius: 50px;
   border: none;
-  background: var(--black);
-  color: var(--white);
-  font: inherit;
+  /* Fully opaque solid gold — no CSS variables, no transparency */
+  background: #B87333;
+  color: #ffffff !important;
+  font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
   cursor: pointer;
   white-space: nowrap;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
-  transition: background 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 4px 14px rgba(184, 115, 51, 0.30);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .accept-btn:hover,
 .accept-btn:active {
-  background: var(--gold-dark);
-  transform: translateY(-1px);
+  background: #7A4E22;
+  box-shadow: 0 4px 16px rgba(122, 78, 34, 0.35);
+  color: #ffffff !important;
 }
 
 .accept-btn .material-icons {
   font-size: 15px;
+  color: #ffffff !important;
+  line-height: 1;
 }
 
+/* Status dropdown in action cell */
 .status-select {
   flex: 1;
-  min-width: 100px;
-  max-width: 140px;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  min-width: 110px;
+  max-width: 150px;
+  height: 36px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(30, 25, 20, 0.18);
+  background: #FAFAF8;
+  color: #161210;
+  padding: 0 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.status-select:focus {
+  border-color: #B87333;
+  box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.12);
 }
 
 .cancelled-label {
   font-size: 13px;
-  color: var(--grey-light);
+  color: #8a7d71;
 }
 
 /* ══════════════════════════════════════
@@ -487,42 +533,42 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--white);
-  color: var(--grey-dark);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(30, 25, 20, 0.14);
+  background: rgba(30, 25, 20, 0.05);
+  color: #4E4844;
   cursor: pointer;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
-  transition: background var(--transition), border-color var(--transition);
   flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .menu-btn:hover,
 .menu-btn:active {
-  background: #f5f5f5;
-  border-color: var(--gold);
+  background: #f7efe6;
+  border-color: #b87333;
 }
 
 .menu-btn .material-icons {
   font-size: 18px;
 }
 
+/* Action dropdown — always fixed so table
+   overflow can never clip it */
 .action-menu {
   position: fixed;
   z-index: 9999;
-  min-width: 160px;
-  background: var(--white);
-  border: 1px solid var(--border);
+  min-width: 164px;
+  background: #ffffff;
+  border: 1px solid rgba(30, 25, 20, 0.1);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  /* Clip internal content cleanly */
   overflow: hidden;
-  animation: menuPop 0.15s ease;
+  animation: menuPop 0.14s ease;
 }
 
 @keyframes menuPop {
@@ -542,18 +588,16 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 11px 14px;
+  /* Generous padding = easier to tap */
+  padding: 13px 16px;
   border: none;
   background: transparent;
-  color: var(--black);
+  color: #1a1610;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   text-align: left;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
   transition: background 0.1s;
@@ -561,12 +605,12 @@
 
 .action-menu__item:hover,
 .action-menu__item:active {
-  background: #f5f5f5;
+  background: #fdf8f3;
 }
 
 .action-menu__item .material-icons {
   font-size: 16px;
-  color: var(--grey-mid);
+  color: #8a7d71;
 }
 
 .action-menu__item--danger {
@@ -588,12 +632,12 @@
 .empty-state {
   padding: 52px 20px;
   text-align: center;
-  color: var(--grey-mid);
+  color: #5d544b;
 }
 
 .empty-state .material-icons {
   font-size: 38px;
-  color: var(--gold);
+  color: #b87333;
   display: block;
   margin-bottom: 12px;
 }
@@ -601,7 +645,7 @@
 .empty-state h3 {
   font-family: 'Playfair Display', serif;
   font-size: 20px;
-  color: var(--black);
+  color: #1a1610;
   margin-bottom: 6px;
 }
 
@@ -624,7 +668,7 @@
 
 .pagination-info {
   font-size: 13px;
-  color: var(--grey-mid);
+  color: #5d544b;
 }
 
 .pagination-controls {
@@ -635,13 +679,14 @@
 }
 
 .page-btn {
-  min-width: 36px;
-  height: 36px;
+  /* 44 × 44 minimum tap target */
+  min-width: 44px;
+  height: 44px;
   padding: 0 8px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--white);
-  color: var(--black);
+  border-radius: 10px;
+  border: 1px solid rgba(30, 25, 20, 0.1);
+  background: #ffffff;
+  color: #1a1610;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -649,12 +694,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
-  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 
 .page-btn .material-icons {
@@ -663,8 +705,9 @@
 
 .page-btn:hover:not(:disabled),
 .page-btn:active:not(:disabled) {
-  background: #f5f5f5;
-  border-color: var(--gold);
+  background: #f7efe6;
+  border-color: #b87333;
+  color: #7a4e22;
 }
 
 .page-btn:disabled {
@@ -674,23 +717,27 @@
 
 .page-btn.active,
 .page-btn--number.active {
-  background: var(--black);
-  color: var(--white);
-  border-color: var(--black);
+  background: #b87333;
+  color: #ffffff;
+  border-color: #b87333;
 }
 
 /* ══════════════════════════════════════
    DRAWER BACKDROP
+   CRITICAL: `pointer-events: auto` must
+   be set — the default `none` on overlays
+   blocks all touch events in some browsers.
 ══════════════════════════════════════ */
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.48);
   z-index: 1000;
-  cursor: default;
+  cursor: pointer;
   border: none;
-  /* mobile touch — allow tap-to-close */
-  touch-action: manipulation;
+  /* Explicitly allow pointer events so
+     tap-to-close registers on iOS */
+  pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -701,20 +748,25 @@
   position: fixed;
   top: 0;
   right: 0;
+  /* dvh handles the iOS Safari bottom bar correctly */
   height: 100vh;
-  /* use dvh on browsers that support it — avoids mobile browser chrome issues */
   height: 100dvh;
   width: min(440px, 100vw);
   background: #ffffff;
   z-index: 1001;
   transform: translateX(110%);
-  transition: transform 0.28s ease;
+  /* Use will-change so the GPU handles the slide */
+  will-change: transform;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.14);
+  /* Drawer scrolls independently */
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  /* Prevent the page behind from scrolling
+     when the user reaches the top/bottom of the drawer */
   overscroll-behavior: contain;
   isolation: isolate;
 }
@@ -728,7 +780,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 18px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(30, 25, 20, 0.1);
   gap: 12px;
   position: sticky;
   top: 0;
@@ -742,47 +794,49 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold-dark);
+  color: #7a4e22;
   margin-bottom: 4px;
 }
 
 .drawer-title {
   font-family: 'Playfair Display', serif;
   font-size: 20px;
-  color: var(--black);
+  color: #1a1610;
   margin: 0 0 8px;
 }
 
 .drawer-close {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  /* 44 × 44 tap target */
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(30, 25, 20, 0.1);
   background: transparent;
-  color: var(--grey-dark);
+  color: #5d544b;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  /* mobile touch */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: background var(--transition), color var(--transition);
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
 .drawer-close:hover,
 .drawer-close:active {
-  background: #f5f5f5;
-  color: var(--black);
+  background: #f7efe6;
+  color: #1a1610;
 }
 
 .drawer-body {
   padding: 18px;
   flex: 1;
   background: #ffffff;
+  /* Independent scroll within the drawer */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .drawer-section {
@@ -794,18 +848,20 @@
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--black);
+  color: #1a1610;
   margin-bottom: 10px;
   padding-bottom: 6px;
-  border-bottom: 1px solid var(--border-slim);
+  border-bottom: 1px solid rgba(30, 25, 20, 0.06);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--border-slim);
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(30, 25, 20, 0.06);
   font-size: 13px;
   gap: 10px;
   flex-wrap: wrap;
@@ -816,7 +872,7 @@
 }
 
 .info-label {
-  color: var(--grey-mid);
+  color: #8a7d71;
   flex-shrink: 0;
   font-size: 13px;
 }
@@ -824,25 +880,23 @@
 .total-row {
   padding-top: 10px;
   margin-top: 4px;
-  border-top: 1px solid var(--border) !important;
+  border-top: 1px solid rgba(30, 25, 20, 0.1) !important;
   border-bottom: none !important;
   font-size: 14px;
 }
 
 .total-row strong {
   font-size: 17px;
-  color: var(--black);
+  color: #1a1610;
   font-weight: 700;
 }
 
 /* ══════════════════════════════════════
    ITEM CARD — per cup/pack in the drawer
-   Shows name, category, qty, price,
-   then that item's specific flavours.
 ══════════════════════════════════════ */
 .item-card {
-  background: #fafafa;
-  border: 1px solid var(--border);
+  background: #fdf8f3;
+  border: 1px solid rgba(30, 25, 20, 0.1);
   border-radius: 12px;
   padding: 12px 14px;
   margin-bottom: 10px;
@@ -865,15 +919,16 @@
   flex-direction: column;
   gap: 5px;
   min-width: 0;
+  flex: 1;
 }
 
 .item-card__name {
   font-size: 14px;
   font-weight: 700;
-  color: var(--black);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #1a1610;
+  /* Allow wrapping on small drawers */
+  white-space: normal;
+  word-break: break-word;
 }
 
 .item-card__tags {
@@ -889,37 +944,37 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--grey-dark);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  background: rgba(200, 138, 74, 0.12);
+  color: #7a4e22;
+  border: 1px solid rgba(200, 138, 74, 0.2);
 }
 
 .item-qty-badge {
   font-size: 11px;
   font-weight: 600;
-  color: var(--grey-mid);
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: var(--radius-pill);
+  color: #8a7d71;
+  background: rgba(30, 25, 20, 0.05);
+  border-radius: 999px;
   padding: 2px 8px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(30, 25, 20, 0.06);
 }
 
 .item-price {
   font-size: 14px;
   font-weight: 700;
-  color: var(--black);
+  color: #7a4e22;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* Flavour area */
+/* Flavour chips row */
 .item-card__flavours {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   padding-top: 8px;
-  border-top: 1px solid var(--border-slim);
+  border-top: 1px solid rgba(30, 25, 20, 0.06);
 }
 
 .item-card__no-flavours {
@@ -927,9 +982,9 @@
   align-items: center;
   gap: 5px;
   padding-top: 8px;
-  border-top: 1px solid var(--border-slim);
+  border-top: 1px solid rgba(30, 25, 20, 0.06);
   font-size: 12px;
-  color: var(--grey-light);
+  color: #8a7d71;
   font-style: italic;
 }
 
@@ -938,8 +993,8 @@
 }
 
 .flavour-chip {
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
+  padding: 5px 12px;
+  border-radius: 999px;
   border: 1.5px solid;
   font-size: 12px;
   font-weight: 600;
@@ -952,19 +1007,19 @@
 .payment-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
-  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--black-soft);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(92, 61, 30, 0.07);
+  color: #1a1610;
+  border: 1px solid rgba(30, 25, 20, 0.06);
 }
 
 .payment-badge--cod {
-  background: var(--gold-soft);
-  color: var(--gold-dark);
-  border-color: var(--gold-border);
+  background: rgba(184, 115, 51, 0.12);
+  color: #7a4e22;
+  border-color: rgba(184, 115, 51, 0.25);
 }
 
 /* ══════════════════════════════════════
@@ -975,8 +1030,8 @@
   bottom: 28px;
   left: 50%;
   transform: translateX(-50%) translateY(16px);
-  background: var(--black);
-  color: var(--white);
+  background: #1a1610;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 500;
   font-family: 'DM Sans', sans-serif;
@@ -988,6 +1043,7 @@
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
   z-index: 2000;
   opacity: 0;
+  /* Toasts should never catch touch events */
   pointer-events: none;
   transition: all 0.3s cubic-bezier(0.34, 1.5, 0.64, 1);
   white-space: nowrap;
@@ -1000,7 +1056,7 @@
 }
 
 /* ══════════════════════════════════════
-   RESPONSIVE — TABLET (≤ 900px)
+   RESPONSIVE — MEDIUM TABLET (≤ 900px)
 ══════════════════════════════════════ */
 @media (max-width: 900px) {
   .orders-toolbar {
@@ -1013,7 +1069,12 @@
     flex-wrap: wrap;
   }
 
-  /* hide contact col to save space */
+  /* 2-column stats at tablet width */
+  .orders-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Hide contact column */
   .orders-table th:nth-child(3),
   .orders-table td:nth-child(3) {
     display: none;
@@ -1025,7 +1086,7 @@
 ══════════════════════════════════════ */
 @media (max-width: 640px) {
 
-  /* stats: single column on small screens */
+  /* Single-column stats */
   .orders-stats {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -1040,7 +1101,7 @@
     font-size: 22px;
   }
 
-  /* toolbar stacks vertically */
+  /* Full-width toolbar controls */
   .orders-toolbar {
     padding: 12px;
     gap: 10px;
@@ -1061,25 +1122,32 @@
 
   .refresh-btn {
     width: 100%;
-    justify-content: center;
-    height: 42px;
   }
 
-  /* hide customer address sub-line */
+  /* Hide address sub-line */
   .customer-cell span {
     display: none;
   }
 
-  /* accept btn: icon only on very small screens */
+  /* Accept button: icon-only at this width */
   .accept-btn .accept-label {
     display: none;
   }
 
   .accept-btn {
-    padding: 0 10px;
+    padding: 0 12px;
   }
 
-  /* pagination */
+  /* Full-width drawer */
+  .order-summary-drawer {
+    width: 100vw;
+  }
+
+  .drawer-title {
+    font-size: 18px;
+  }
+
+  /* Pagination stacks */
   .orders-footer {
     flex-direction: column;
     align-items: center;
@@ -1090,20 +1158,9 @@
     text-align: center;
   }
 
-  /* drawer full-width on mobile */
-  .order-summary-drawer {
-    width: 100vw;
-    width: 100%;
-  }
-
-  .drawer-title {
-    font-size: 18px;
-  }
-
-  /* bigger touch targets for pagination */
-  .page-btn {
-    min-width: 40px;
-    height: 40px;
+  /* Hide middle page numbers */
+  .page-btn--number:not(.active):not(:first-of-type):not(:last-of-type) {
+    display: none;
   }
 }
 
@@ -1119,7 +1176,7 @@
     font-size: 20px;
   }
 
-  /* hide status col, keep id+customer+action */
+  /* Drop status column — keep ID, Customer, Action */
   .orders-table th:nth-child(4),
   .orders-table td:nth-child(4) {
     display: none;
@@ -1132,6 +1189,13 @@
 
   .orders-table thead th {
     padding: 10px 10px;
+    font-size: 10px;
+  }
+
+  /* The table now only has 3 visible cols,
+     reduce min-width so it fits without horizontal scroll */
+  .orders-table {
+    min-width: 300px;
   }
 
   .status-badge {
@@ -1141,7 +1205,7 @@
 
   .status-select {
     min-width: 88px;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .drawer-body {
@@ -1169,27 +1233,107 @@
   }
 
   .flavour-chip {
-    padding: 3px 10px;
+    padding: 4px 10px;
     font-size: 11px;
   }
 
-  /* bigger tap targets for action buttons */
+  /* Ensure minimum tap targets everywhere on small screens */
   .accept-btn {
-    height: 40px;
+    min-height: 44px;
   }
 
   .menu-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .drawer-close {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
-  /* hide middle page numbers */
-  .page-btn--number:not(.active):not(:first-of-type):not(:last-of-type) {
+  .page-btn {
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — VERY SMALL (≤ 360px)
+   Galaxy A series, older iPhones SE
+══════════════════════════════════════ */
+@media (max-width: 360px) {
+  .orders-page {
+    font-size: 12px;
+  }
+
+  .stat-card {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .stat-card__value {
+    font-size: 20px;
+  }
+
+  .icon-chip {
+    width: 36px;
+    height: 36px;
+  }
+
+  .icon-chip .material-icons {
+    font-size: 18px;
+  }
+
+  .orders-toolbar {
+    padding: 10px;
+  }
+
+  .toolbar-copy h2 {
+    font-size: 15px;
+  }
+
+  /* Only ID + Action visible at this size */
+  .orders-table th:nth-child(2),
+  .orders-table td:nth-child(2) {
     display: none;
+  }
+
+  .orders-table {
+    min-width: 240px;
+  }
+
+  .action-menu {
+    min-width: 148px;
+  }
+
+  .action-menu__item {
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+
+  .drawer-header {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .drawer-body {
+    padding: 12px;
+  }
+
+  .drawer-title {
+    font-size: 15px;
+  }
+
+  .drawer-section {
+    margin-bottom: 16px;
+  }
+
+  .info-row {
+    font-size: 12px;
+  }
+
+  .total-row strong {
+    font-size: 15px;
   }
 }

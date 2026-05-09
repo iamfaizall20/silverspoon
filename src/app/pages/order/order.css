@@ -940,6 +940,7 @@
     transform: scale(1) translateY(0);
 }
 
+/* ─── SUCCESS DIALOG — updated ─── */
 .success-icon {
     width: 68px;
     height: 68px;
@@ -949,7 +950,69 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto 18px;
-    font-size: 30px;
+}
+
+.success-icon .material-icons {
+    font-size: 32px;
+    color: #B87333;
+}
+
+.order-id-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #F5F0EA;
+    border: 1.5px solid rgba(30, 25, 20, 0.18);
+    border-radius: 12px;
+    padding: 10px 18px;
+    margin-bottom: 22px;
+}
+
+.order-id-text {
+    font-family: 'Courier Prime', 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1A1610;
+    letter-spacing: 1px;
+}
+
+.copy-id-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9A9088;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.2s;
+}
+
+.copy-id-btn:hover {
+    color: #B87333;
+}
+
+.copy-id-btn .material-icons {
+    font-size: 18px;
+}
+
+/* ─── BUTTON SPINNER ─── */
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .success-box h2 {

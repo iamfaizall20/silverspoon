@@ -14,7 +14,7 @@ interface StatusStep {
 
 interface OrderResult {
   id: number;
-  order_number: string;           // e.g. "ORD-136871"
+  order_number: string;
   status: OrderStatus;
   customer_name: string;
   order_date: string;
@@ -58,7 +58,6 @@ export class Myorders {
 
     try {
       const all = await this.menuService.getOrders() as OrderResult[];
-      // Match against the order_number column (e.g. "ORD-136871")
       const found = all.find(o =>
         (o.order_number ?? '').toUpperCase() === id
       );
@@ -81,12 +80,14 @@ export class Myorders {
   }
 
   stepIndex(status: OrderStatus): number {
-    const idx = this.statusSteps.findIndex(s => s.key === status);
-    return idx === -1 ? 0 : idx;
+    return this.statusSteps.findIndex(s => s.key === status);
   }
 
   isStepDone(orderStatus: OrderStatus, stepKey: OrderStatus): boolean {
-    return this.stepIndex(orderStatus) >= this.stepIndex(stepKey);
+    const orderIdx = this.stepIndex(orderStatus);
+    const stepIdx = this.stepIndex(stepKey);
+    if (orderIdx === -1 || stepIdx === -1) return false;
+    return orderIdx > stepIdx;
   }
 
   isStepActive(orderStatus: OrderStatus, stepKey: OrderStatus): boolean {

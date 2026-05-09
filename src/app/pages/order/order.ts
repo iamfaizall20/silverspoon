@@ -48,6 +48,9 @@ export class Order implements OnInit {
   currentStep = 1;
   totalSteps = 4;
   showSuccess = false;
+  isPlacingOrder = false;
+  copied = false;
+
 
   order: OrderData = {
     name: '',
@@ -253,9 +256,18 @@ export class Order implements OnInit {
     return this.order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment';
   }
 
+  // Copy Order ID
+  copyOrderId(): void {
+    navigator.clipboard.writeText(this.orderNumber).then(() => {
+      this.copied = true;
+      setTimeout(() => this.copied = false, 2000);
+    });
+  }
+
   // ── PLACE ORDER ──
 
   async placeOrder() {
+    this.isPlacingOrder = true;
     try {
       const orderPayload = {
         customer_name: this.order.name,
@@ -303,11 +315,13 @@ export class Order implements OnInit {
 
       console.log('Order placed successfully');
       this.showSuccess = true;
-      setTimeout(() => this.router.navigate(['/']), 3000);
+      setTimeout(() => this.router.navigate(['/']), 5000);
 
     } catch (err) {
       console.error('Order failed:', err);
       alert('Something went wrong placing your order');
+    } finally {
+      this.isPlacingOrder = false;
     }
   }
 

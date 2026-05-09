@@ -13,8 +13,8 @@
             <span class="brand-name">SilverSpoon</span>
         </a>
 
-        <!-- User Profile Section (shown when logged in) -->
-        <div class="user-profile" *ngIf="user" (click)="toggleDropdown()" [class.open]="dropdownOpen">
+        <!-- Desktop: User Profile (logged in) -->
+        <div class="user-profile desktop-only" *ngIf="user" (click)="toggleDropdown()" [class.open]="dropdownOpen">
             <div class="avatar">{{ userInitial }}</div>
             <span class="user-name">{{ user.name }}</span>
             <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -22,7 +22,6 @@
                 <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
 
-            <!-- Dropdown Menu -->
             <div class="dropdown-menu" (click)="$event.stopPropagation()">
                 <a class="dropdown-item" (click)="onMyProfile()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -54,11 +53,71 @@
             </div>
         </div>
 
-        <!-- Action buttons (shown when NOT logged in) -->
-        <div class="nav-actions" *ngIf="!user">
+        <!-- Desktop: Auth buttons (logged out) -->
+        <div class="nav-actions desktop-only" *ngIf="!user">
             <button (click)="onLogin()" class="btn-ghost">Log in</button>
             <button (click)="onSignup()" class="btn-solid">Sign up</button>
         </div>
 
+        <!-- Mobile: Hamburger button (always shown on small screens) -->
+        <button class="hamburger mobile-only" (click)="toggleMobileMenu()" [class.open]="mobileMenuOpen"
+            aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
     </div>
 </nav>
+
+<!-- Mobile Drawer -->
+<div class="mobile-backdrop" [class.visible]="mobileMenuOpen" (click)="closeMobileMenu()"></div>
+<div class="mobile-drawer" [class.open]="mobileMenuOpen">
+
+    <!-- Logged in -->
+    <ng-container *ngIf="user">
+        <div class="mobile-user-header">
+            <div class="mobile-avatar">{{ userInitial }}</div>
+            <div>
+                <div class="mobile-user-name">{{ user.name }}</div>
+            </div>
+        </div>
+        <div class="mobile-divider"></div>
+        <a class="mobile-item" (click)="onMyProfile(); closeMobileMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            My Profile
+        </a>
+        <a class="mobile-item" (click)="onMyOrders(); closeMobileMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            Track Order
+        </a>
+        <div class="mobile-divider"></div>
+        <a class="mobile-item logout" (click)="onLogout(); closeMobileMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Log out
+        </a>
+    </ng-container>
+
+    <!-- Logged out -->
+    <ng-container *ngIf="!user">
+        <div class="mobile-auth-btns">
+            <button class="btn-ghost full-width" (click)="onLogin(); closeMobileMenu()">Log in</button>
+            <button class="btn-solid full-width" (click)="onSignup(); closeMobileMenu()">Sign up</button>
+        </div>
+    </ng-container>
+
+</div>

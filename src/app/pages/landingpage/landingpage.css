@@ -877,6 +877,9 @@
     }
 }
 
+/* ══════════════════════════════════════
+   RESPONSIVE — MOBILE HERO TEXT
+══════════════════════════════════════ */
 @media (max-width: 600px) {
     .hero-banner {
         height: 100vh;
@@ -891,6 +894,27 @@
         width: 100%;
     }
 
+    .hero-slogan {
+        font-size: clamp(38px, 11vw, 56px);
+        line-height: 1.08;
+        letter-spacing: -1px;
+        margin-bottom: 16px;
+    }
+
+    .hero-para {
+        font-size: 13px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.78);
+        max-width: 300px;
+        margin-bottom: 32px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 13px 28px;
+        font-size: 14px;
+    }
+
     .flavours-section,
     .featured-section {
         padding: 72px 4%;
@@ -900,7 +924,6 @@
         padding: 90px 4% 70px;
     }
 
-    /* On mobile let cards stretch to fill the 2/3-col layout naturally */
     .flavours-grid {
         grid-template-columns: repeat(3, 1fr);
         max-width: 100%;
@@ -922,6 +945,15 @@
 }
 
 @media (max-width: 380px) {
+    .hero-slogan {
+        font-size: clamp(34px, 10vw, 44px);
+    }
+
+    .hero-para {
+        font-size: 12px;
+        max-width: 260px;
+    }
+
     .flavours-grid {
         grid-template-columns: repeat(2, 1fr);
     }
